@@ -1,0 +1,145 @@
+.page {
+    background: url("../images/background.jpg") #91E4FB;
+    text-align: center;
+}
+.page-head {
+    margin: 27px auto 0;
+    min-width: 350px;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.head-logo {
+    font-size: 50px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.indication-circle {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: #E61610;
+    border-radius: 10px;
+    vertical-align: middle;
+}
+.wrapper {
+    margin: auto;
+    max-width: 60%;
+    min-width: 350px;
+}
+.sign {
+    text-align: right;
+    user-select: none;
+    -webkit-user-select: none;
+}
+#sign-name {
+    display: inline;
+    font-size: 15px;
+    width: 10em;
+    outline: none;
+    border: none;
+}
+#user-name {
+    display: inline;
+    clear: none;
+    font-size: 25px;
+}
+.sign-button {
+    background-color: #E6E6E6;
+    margin-left: 5px;
+    font-size: 15px;
+    border: none;
+}
+.chat-box {
+    height: 400px;
+    background-color: #FFFFFF;
+    margin-top: 10px;
+    border: none;
+    overflow: auto;
+}
+.sender-name {
+    padding: 0;
+    height: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    float: left;
+}
+.tools-button {
+    font-size: 15px;
+    float: right;
+    outline: none;
+    border: none;
+}
+#tools-confirm {
+    display: inline;
+    background: #72BB53;
+    color: #FFFFFF;
+}
+#message-edit {
+    background: #E6E6E6;
+}
+#message-delete {
+    background: #E61610;
+    color: #FFFFFF;
+}
+.message-edit-text {
+    padding: 0;
+    width: 100%;
+    height: 60px;
+    background: #F7F6F6;
+    font-size: 15px;
+    resize: none;
+    border: none;
+    overflow: auto;
+}
+.message-item {
+    clear: both;
+    overflow: hidden;
+    text-align: justify;
+    font-style: normal;
+    font-size: 18px;
+    word-wrap: break-word;
+}
+.modify {
+    font-size: 15px;
+    font-style: italic;
+    text-align: left;
+    clear: both;
+}
+.box-scroll {
+    background-color: #E6E6E6;
+    outline: #E6E6E6;
+    width: 100%;
+    border: none;
+}
+.box-scroll:active {
+    background-color: #C0C0C0;
+}
+.send-message {
+    margin-top: 5%;
+    height: 60px;
+}
+#message-text {
+    padding: 0;
+    width: 81%;
+    height: 60px;
+    font-size: 15px;
+    resize: none;
+    border: none;
+    overflow: auto;
+    outline: none;
+    float: left;
+}
+#send-button {
+    height: 60px;
+    border: none;
+    width: 17%;
+    font-size: 15px;
+    background-color: #E6E6E6;
+    float: right;
+}
+.footer {
+    font-size: 18px;
+    margin: 100px auto;
+}
