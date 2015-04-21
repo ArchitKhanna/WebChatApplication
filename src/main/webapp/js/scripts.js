@@ -9,14 +9,6 @@ var getId = function() {
     return Math.floor(currentDate * random).toString();
 };
 
-var theMessage = function(sender, message, id) {
-    return {
-        id: id || getId(),
-        senderName: sender,
-        messageText: message
-    };
-};
-
 var chatState = {
     chatUrl: 'http://localhost:999/chat',
     currentUser: null,
@@ -153,7 +145,10 @@ function onSignOutClick() {
 function onMessageSend(continueWith) {
     var messageText = document.getElementById('message-text');
     if (inputChecker(messageText.value) == true) {
-        var message = theMessage(chatState.currentUser, messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n"));
+        var message = {
+            senderName: chatState.currentUser,
+            messageText: messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n")
+        };
         postRequest(chatState.chatUrl, JSON.stringify(message), function () {
             continueWith && continueWith();
         });
@@ -309,8 +304,11 @@ function onMessageConfirmClick(tools, continueWith) {
         tools.removeChild(tools.lastChild);
         tools.appendChild(toolsButtonsChange('edit'));
         var id = divMessage.attributes['id'].value;
-        var editMessage = theMessage("", text, id);
-        putRequest(chatState.chatUrl, JSON.stringify(editMessage), function () {
+        var message = {
+            id: id,
+            messageText: text
+        };
+        putRequest(chatState.chatUrl, JSON.stringify(message), function () {
             continueWith && continueWith();
         });
     }
@@ -318,8 +316,10 @@ function onMessageConfirmClick(tools, continueWith) {
 
 function onMessageDelete(divMessage, continueWith) {
     var id = divMessage.attributes['id'].value;
-    var deleteMessage = theMessage("", "", id);
-    deleteRequest(chatState.chatUrl, JSON.stringify(deleteMessage), function () {
+    var message = {
+        id: id
+    };
+    deleteRequest(chatState.chatUrl, JSON.stringify(message), function () {
         continueWith && continueWith();
     });
 }
@@ -466,7 +466,6 @@ function availableSwitcher(newCondition) {
 
 
 function unavailableAlert(method) {
-
     if (method == 'POST') {
         alert("Message hasn't been sent. Server is unavailable!");
     }
