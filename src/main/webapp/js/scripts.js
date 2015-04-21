@@ -10,7 +10,7 @@ var getId = function() {
 };
 
 var chatState = {
-    chatUrl: 'http://localhost:999/chat',
+    chatUrl: 'chat',
     currentUser: null,
     messageList: [],
     token: 'TN11EN',
@@ -146,6 +146,7 @@ function onMessageSend(continueWith) {
     var messageText = document.getElementById('message-text');
     if (inputChecker(messageText.value) == true) {
         var message = {
+            id: getId(),
             senderName: chatState.currentUser,
             messageText: messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n")
         };
