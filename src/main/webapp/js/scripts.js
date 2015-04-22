@@ -3,12 +3,6 @@
  */
 'use strict';
 
-var getId = function() {
-    var currentDate = Date.now();
-    var random = Math.random() * Math.random();
-    return Math.floor(currentDate * random).toString();
-};
-
 var chatState = {
     chatUrl: 'chat',
     currentUser: null,
@@ -146,7 +140,6 @@ function onMessageSend(continueWith) {
     var messageText = document.getElementById('message-text');
     if (inputChecker(messageText.value) == true) {
         var message = {
-            id: getId(),
             senderName: chatState.currentUser,
             messageText: messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n")
         };
