@@ -45,7 +45,7 @@ public final class MessageUtil {
     }
 
     private static String generateCurrentDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy, HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Minsk"));
         return dateFormat.format(new Date());
     }

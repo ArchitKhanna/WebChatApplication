@@ -19,7 +19,7 @@ public final class MessageStorage {
         return HISTORY;
     }
 
-    public static void addElement(Message message) {
+    public static void addMessage(Message message) {
         HISTORY.add(message);
     }
 
