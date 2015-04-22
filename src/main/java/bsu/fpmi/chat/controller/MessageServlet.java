@@ -46,15 +46,14 @@ public class MessageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Post request");
         String data = getMessageBody(request);
-        logger.info("Request data : "+data);
+        logger.info("Request data : " + data);
         try {
             JSONObject jsonObject = stringToJson(data);
             Message message = jsonToMessage(jsonObject);
             logger.info(message.getReadableView());
             MessageStorage.addMessage(message);
             response.setStatus(HttpServletResponse.SC_OK);
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
         }
