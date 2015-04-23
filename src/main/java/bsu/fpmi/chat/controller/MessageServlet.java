@@ -28,6 +28,11 @@ public class MessageServlet extends HttpServlet {
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
 
     @Override
+    public void init() throws ServletException {
+        super.init();
+    }
+
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String token = request.getParameter(TOKEN);
         if (token != null && !"".equals(token)) {
@@ -39,6 +44,7 @@ public class MessageServlet extends HttpServlet {
             pw.flush();
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "token parameter is absent");
+            logger.error("Token parameter is absent");
         }
     }
 
