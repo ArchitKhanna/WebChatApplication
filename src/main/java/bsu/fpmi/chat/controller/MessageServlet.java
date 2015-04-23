@@ -2,15 +2,19 @@ package bsu.fpmi.chat.controller;
 
 import bsu.fpmi.chat.model.Message;
 import bsu.fpmi.chat.model.MessageStorage;
+import bsu.fpmi.chat.storage.MessageXMLParser;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.xml.sax.SAXException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -29,7 +33,14 @@ public class MessageServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        super.init();
+        if(!MessageXMLParser.isStorageExist()) {
+            try {
+                MessageXMLParser.createStorage();
+            }
+            catch (ParserConfigurationException | TransformerException e) {
+                logger.error(e);
+            }
+        }
     }
 
     @Override
@@ -57,9 +68,10 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             Message message = jsonToMessage(jsonObject);
             logger.info(message.getReadableView());
+            MessageXMLParser.addMessage(message);
             MessageStorage.addMessage(message);
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (ParseException e) {
+        } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
         }
