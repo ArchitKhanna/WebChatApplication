@@ -35,12 +35,20 @@ public class Message {
         return ID;
     }
 
+    public String getSenderName() {
+        return senderName;
+    }
+
     public String getMessageText() {
         return messageText;
     }
 
     public String getSendDate() {
         return sendDate;
+    }
+
+    public String getModifyDate() {
+        return modifyDate;
     }
 
     public boolean isDeleted() {
