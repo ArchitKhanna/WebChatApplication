@@ -1,7 +1,6 @@
 package bsu.fpmi.chat.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,8 +22,8 @@ public final class MessageStorage {
         HISTORY.add(message);
     }
 
-    public static void addAll(Message[] messages) {
-        HISTORY.addAll(Arrays.asList(messages));
+    public static void addAll(List<Message> messages) {
+        HISTORY.addAll(messages);
     }
 
     public static int getSize() {

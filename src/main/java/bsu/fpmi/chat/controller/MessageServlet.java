@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -33,13 +35,10 @@ public class MessageServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        if(!MessageXMLParser.isStorageExist()) {
-            try {
-                MessageXMLParser.createStorage();
-            }
-            catch (ParserConfigurationException | TransformerException e) {
-                logger.error(e);
-            }
+        try {
+            restoreHistory();
+        } catch (TransformerException | ParserConfigurationException | XMLStreamException | FileNotFoundException e) {
+            logger.error(e);
         }
     }
 
@@ -83,5 +82,15 @@ public class MessageServlet extends HttpServlet {
         jsonObject.put(MESSAGES, MessageStorage.getSubHistory(index));
         jsonObject.put(TOKEN, getToken(MessageStorage.getSize()));
         return jsonObject.toJSONString();
+    }
+
+
+    private void restoreHistory() throws TransformerException, ParserConfigurationException, XMLStreamException,
+            FileNotFoundException {
+        if (!MessageXMLParser.isStorageExist()) {
+            MessageXMLParser.createStorage();
+        } else {
+            MessageStorage.addAll(MessageXMLParser.getMessages());
+        }
     }
 }

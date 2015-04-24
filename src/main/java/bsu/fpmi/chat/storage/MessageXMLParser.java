@@ -8,11 +8,18 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -84,8 +91,51 @@ public final class MessageXMLParser {
         transformer.transform(source, result);
     }
 
-    public static synchronized List<Message> getMessages() {
-        return null;
+    public static synchronized List<Message> getMessages() throws XMLStreamException, FileNotFoundException {
+        List<Message> messages = new ArrayList<>();
+        String id = null;
+        String senderName = null;
+        String messageText = null;
+        String sendDate = null;
+        String modifyDate = null;
+        boolean isDeleted = false;
+        String tagContent = null;
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new FileReader(XML_LOCATION));
+        while (xmlStreamReader.hasNext()) {
+            switch (xmlStreamReader.next()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    if (MESSAGE.equals(xmlStreamReader.getLocalName())) {
+                        id = xmlStreamReader.getAttributeValue(0);
+                    }
+                    break;
+                case XMLStreamConstants.CHARACTERS:
+                    tagContent = xmlStreamReader.getText().trim();
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    String eventName = xmlStreamReader.getLocalName();
+                    if (MESSAGE.equals(eventName)) {
+                        messages.add(new Message(id, senderName, messageText, sendDate, modifyDate, isDeleted));
+                    }
+                    if (SENDER_NAME.equals(eventName)) {
+                        senderName = tagContent;
+                    }
+                    if (MESSAGE_TEXT.equals(eventName)) {
+                        messageText = tagContent;
+                    }
+                    if (SEND_DATE.equals(eventName)) {
+                        sendDate = tagContent;
+                    }
+                    if (MODIFY_DATE.equals(eventName)) {
+                        modifyDate = tagContent;
+                    }
+                    if (DELETED.equals(eventName)) {
+                        isDeleted = Boolean.valueOf(tagContent);
+                    }
+                    break;
+            }
+        }
+        return messages;
     }
 
     private static Transformer getTransformer() throws TransformerConfigurationException {
