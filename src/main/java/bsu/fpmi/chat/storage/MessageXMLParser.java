@@ -27,7 +27,7 @@ import java.util.List;
  * FAMCS 2d course 5th group
  */
 public final class MessageXMLParser {
-    private static final String XML_LOCATION = "E:\\history.xml";
+    private static final String XML_LOCATION = System.getProperty("user.home") + File.separator + "history.xml";
     private static final String MESSAGES = "messages";
     private static final String MESSAGE = "message";
     private static final String ID = "id";
@@ -99,38 +99,34 @@ public final class MessageXMLParser {
         String sendDate = null;
         String modifyDate = null;
         boolean isDeleted = false;
-        String tagContent = null;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new FileReader(XML_LOCATION));
         while (xmlStreamReader.hasNext()) {
             switch (xmlStreamReader.next()) {
                 case XMLStreamConstants.START_ELEMENT:
+                    String eventName = xmlStreamReader.getLocalName();
                     if (MESSAGE.equals(xmlStreamReader.getLocalName())) {
                         id = xmlStreamReader.getAttributeValue(0);
                     }
-                    break;
-                case XMLStreamConstants.CHARACTERS:
-                    tagContent = xmlStreamReader.getText().trim();
-                    break;
-                case XMLStreamConstants.END_ELEMENT:
-                    String eventName = xmlStreamReader.getLocalName();
-                    if (MESSAGE.equals(eventName)) {
-                        messages.add(new Message(id, senderName, messageText, sendDate, modifyDate, isDeleted));
-                    }
                     if (SENDER_NAME.equals(eventName)) {
-                        senderName = tagContent;
+                        senderName = xmlStreamReader.getElementText().trim();
                     }
                     if (MESSAGE_TEXT.equals(eventName)) {
-                        messageText = tagContent;
+                        messageText = xmlStreamReader.getElementText().trim();
                     }
                     if (SEND_DATE.equals(eventName)) {
-                        sendDate = tagContent;
+                        sendDate = xmlStreamReader.getElementText().trim();
                     }
                     if (MODIFY_DATE.equals(eventName)) {
-                        modifyDate = tagContent;
+                        modifyDate = xmlStreamReader.getElementText().trim();
                     }
                     if (DELETED.equals(eventName)) {
-                        isDeleted = Boolean.valueOf(tagContent);
+                        isDeleted = Boolean.valueOf(xmlStreamReader.getElementText().trim());
+                    }
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    if (MESSAGE.equals(xmlStreamReader.getLocalName())) {
+                        messages.add(new Message(id, senderName, messageText, sendDate, modifyDate, isDeleted));
                     }
                     break;
             }
@@ -142,7 +138,6 @@ public final class MessageXMLParser {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
         return transformer;
     }
 

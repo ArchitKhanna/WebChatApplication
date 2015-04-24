@@ -34,12 +34,21 @@ public final class MessageStorage {
         return HISTORY.subList(index, HISTORY.size());
     }
 
-    public Message getMessageById(String id) {
+    public static Message getMessageById(String id) {
         for (Message message : HISTORY) {
             if (id.equals(message.getID())) {
                 return message;
             }
         }
         return null;
+    }
+
+    public static String getStringView() {
+        StringBuffer sb = new StringBuffer();
+        for (Message message : HISTORY) {
+            sb.append(message.getReadableView());
+            sb.append('\n');
+        }
+        return sb.toString().trim();
     }
 }

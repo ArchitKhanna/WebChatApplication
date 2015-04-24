@@ -91,6 +91,7 @@ public class MessageServlet extends HttpServlet {
             MessageXMLParser.createStorage();
         } else {
             MessageStorage.addAll(MessageXMLParser.getMessages());
+            logger.info('\n' + MessageStorage.getStringView());
         }
     }
 }
