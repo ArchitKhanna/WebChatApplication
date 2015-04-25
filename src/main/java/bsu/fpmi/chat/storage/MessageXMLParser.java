@@ -105,7 +105,7 @@ public final class MessageXMLParser {
             switch (xmlStreamReader.next()) {
                 case XMLStreamConstants.START_ELEMENT:
                     String eventName = xmlStreamReader.getLocalName();
-                    if (MESSAGE.equals(xmlStreamReader.getLocalName())) {
+                    if (MESSAGE.equals(eventName)) {
                         id = xmlStreamReader.getAttributeValue(0);
                     }
                     if (SENDER_NAME.equals(eventName)) {
