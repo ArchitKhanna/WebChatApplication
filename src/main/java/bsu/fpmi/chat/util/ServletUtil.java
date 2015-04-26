@@ -8,7 +8,7 @@ import java.io.IOException;
  * Created by Gennady Trubach on 21.04.2015.
  * FAMCS 2d course 5th group
  */
-public class ServletUtil {
+public final class ServletUtil {
     public static final String APPLICATION_JSON = "application/json";
 
     private ServletUtil() {
