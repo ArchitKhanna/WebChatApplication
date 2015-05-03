@@ -24,6 +24,7 @@ public final class MessageUtil {
     private static final String SENDER_NAME = "senderName";
     private static final String MESSAGE_TEXT = "messageText";
     private static final String NOT_MODIFIED = "not modified";
+    private static final String DELETED = "isDeleted";
     private static final long LIMIT = 10000000000L;
 
     private MessageUtil() {
@@ -55,12 +56,22 @@ public final class MessageUtil {
         return (JSONObject) jsonParser.parse(data.trim());
     }
 
-    public static Message jsonToMessage(JSONObject jsonObject) {
+    public static Message jsonToNewMessage(JSONObject jsonObject) {
         Object senderName = jsonObject.get(SENDER_NAME);
         Object messageText = jsonObject.get(MESSAGE_TEXT);
         if (senderName != null && messageText != null) {
             return new Message(generateId(), (String) senderName, (String) messageText, generateCurrentDate(),
                     NOT_MODIFIED, Boolean.FALSE);
+        }
+        return null;
+    }
+
+    public static Message jsonToCurrentMessage(JSONObject jsonObject) {
+        Object id = jsonObject.get(ID);
+        Object messageText = jsonObject.get(MESSAGE_TEXT);
+        Object isDeleted = jsonObject.get(DELETED);
+        if (id != null) {
+            return new Message((String) id, null, (String) messageText, null, null, (Boolean) isDeleted);
         }
         return null;
     }

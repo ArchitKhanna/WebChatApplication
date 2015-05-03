@@ -387,6 +387,7 @@ function putRequest(url, data, continueWith, continueWithError) {
 
 function defaultErrorHandler(message) {
     console.error(message);
+    chatState.token = 'TN' + chatState.messageList.length + 'EN';
     restoreMessages();
 }
 

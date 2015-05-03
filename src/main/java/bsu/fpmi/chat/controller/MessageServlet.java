@@ -1,5 +1,6 @@
 package bsu.fpmi.chat.controller;
 
+import bsu.fpmi.chat.exception.ModifyException;
 import bsu.fpmi.chat.model.Message;
 import bsu.fpmi.chat.util.ChangesStorageUtil;
 import bsu.fpmi.chat.storage.MessageXMLParser;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -65,7 +67,7 @@ public class MessageServlet extends HttpServlet {
         logger.info("Request data : " + data);
         try {
             JSONObject jsonObject = stringToJson(data);
-            Message message = jsonToMessage(jsonObject);
+            Message message = jsonToNewMessage(jsonObject);
             logger.info(message.getReadableView());
             MessageXMLParser.addMessage(message);
             ChangesStorageUtil.addMessage(message);
@@ -81,19 +83,43 @@ public class MessageServlet extends HttpServlet {
         logger.info("Put request");
         String data = getMessageBody(request);
         logger.info("Request data : " + data);
+        Message message = null;
         try {
             JSONObject jsonObject = stringToJson(data);
-            Message message = jsonToMessage(jsonObject);
-            //ChangesStorageUtil.addMessage();
-        } catch (ParseException e) {
+            message = jsonToCurrentMessage(jsonObject);
+            message.setModified();
+            Message updatedMessage = MessageXMLParser.updateMessage(message);
+            ChangesStorageUtil.addMessage(updatedMessage);
+        } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
+                NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
+        } catch (ModifyException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            logger.error("Message with id : " + message.getID() + " doesn't exist, was deleted or not modified");
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        super.doDelete(request, response);
+        logger.info("Delete request");
+        String data = getMessageBody(request);
+        logger.info("Request data : " + data);
+        Message message = null;
+        try {
+            JSONObject jsonObject = stringToJson(data);
+            message = jsonToCurrentMessage(jsonObject);
+            message.delete();
+            Message updatedMessage = MessageXMLParser.updateMessage(message);
+            ChangesStorageUtil.addMessage(updatedMessage);
+        } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
+                NullPointerException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            logger.error("Invalid message");
+        } catch (ModifyException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            logger.error("Message with id : " + message.getID() + " doesn't exist, was deleted or not modified");
+        }
     }
 
     @SuppressWarnings("unchecked")

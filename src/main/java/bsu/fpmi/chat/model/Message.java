@@ -23,8 +23,7 @@ public class Message {
         this.isDeleted = isDeleted;
     }
 
-    public void modify(String newMessageText) {
-        messageText = newMessageText;
+    public void setModified() {
         modifyDate = MessageUtil.generateCurrentDate();
     }
 

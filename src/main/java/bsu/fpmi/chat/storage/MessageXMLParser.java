@@ -1,5 +1,6 @@
 package bsu.fpmi.chat.storage;
 
+import bsu.fpmi.chat.exception.ModifyException;
 import bsu.fpmi.chat.model.Message;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -138,7 +139,7 @@ public final class MessageXMLParser {
     }
 
     public static synchronized Message updateMessage(Message message) throws ParserConfigurationException, IOException,
-            SAXException, XPathExpressionException, TransformerException {
+            SAXException, XPathExpressionException, TransformerException, NullPointerException, ModifyException {
         DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
         Document document = documentBuilder.parse(XML_LOCATION);
@@ -147,7 +148,7 @@ public final class MessageXMLParser {
 
         String senderName = null;
         String sendDate = null;
-        for (int i = 0; i < nodeList.getLength(); i++) {
+        for (int i = nodeList.getLength()-1; i >=0; i--) {
             Node node = nodeList.item(i);
 
             if (SENDER_NAME.equals(node.getNodeName())) {
@@ -163,6 +164,9 @@ public final class MessageXMLParser {
                 node.setTextContent(message.getModifyDate());
             }
             if (DELETED.equals(node.getNodeName())) {
+                if (Boolean.valueOf(node.getTextContent())) {
+                    throw new ModifyException();
+                }
                 node.setTextContent(Boolean.toString(message.isDeleted()));
             }
         }
@@ -172,8 +176,7 @@ public final class MessageXMLParser {
         StreamResult result = new StreamResult(XML_LOCATION);
         transformer.transform(source, result);
 
-        return new Message(message.getID(), senderName, message.getMessageText(), sendDate, message.getModifyDate(),
-                message.isDeleted());
+        return new Message(message.getID(), senderName, message.getMessageText(), sendDate, message.getModifyDate(), message.isDeleted());
     }
 
     private static Node getNodeById(Document document, String id) throws XPathExpressionException {
