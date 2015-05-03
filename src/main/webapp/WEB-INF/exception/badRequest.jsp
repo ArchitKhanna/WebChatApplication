@@ -5,18 +5,18 @@
   Time: 14:32
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" isErrorPage="true" %>
 <html>
 <head>
     <title>400 Bad Request</title>
-    <link rel="stylesheet" type="text/css" href="../resources/css/exceptionStyle.css">
+    <link rel="stylesheet" type="text/css" href=href="resources/css/exceptionStyle.css">
 </head>
 <body class="page">
 <div class="logo">
-    <img src="../resources/images/logo.png" alt="MyChat">
+    <img src="resources/images/logo.png" alt="MyChat">
 </div>
 <div class="picture">
-    <img src="../resources/images/sad_cat.png">
+    <img src="resources/images/sad_cat.png">
 </div>
 <div class="header">
     400 - Bad request :(

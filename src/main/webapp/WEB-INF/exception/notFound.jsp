@@ -5,19 +5,19 @@
   Time: 14:33
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" isErrorPage="true" %>
 <html>
 <head>
   <title>404 Not Found</title>
-  <link rel="stylesheet" type="text/css" href="../resources/css/exceptionStyle.css">
+  <link rel="stylesheet" type="text/css" href="resources/css/exceptionStyle.css">
 </head>
 <body class="page">
 <div class="logo">
-  <img src="../resources/images/logo.png" alt="MyChat">
+  <img src="resources/images/logo.png" alt="MyChat">
 </div>
 <div class="picture">
     <a href="http://www.nickjr.com/kids-games/casa-de-dora.html" target="_blank">
-        <img src="../resources/images/dora.jpg" height="500" width=800">
+        <img src="resources/images/dora.jpg" height="500" width=800">
     </a>
 </div>
 <div class="header">
