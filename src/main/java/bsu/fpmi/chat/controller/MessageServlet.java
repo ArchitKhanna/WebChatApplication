@@ -1,7 +1,7 @@
 package bsu.fpmi.chat.controller;
 
 import bsu.fpmi.chat.model.Message;
-import bsu.fpmi.chat.model.MessageStorage;
+import bsu.fpmi.chat.util.ChangesStorageUtil;
 import bsu.fpmi.chat.storage.MessageXMLParser;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -68,7 +68,7 @@ public class MessageServlet extends HttpServlet {
             Message message = jsonToMessage(jsonObject);
             logger.info(message.getReadableView());
             MessageXMLParser.addMessage(message);
-            MessageStorage.addMessage(message);
+            ChangesStorageUtil.addMessage(message);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -76,11 +76,31 @@ public class MessageServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        logger.info("Put request");
+        String data = getMessageBody(request);
+        logger.info("Request data : " + data);
+        try {
+            JSONObject jsonObject = stringToJson(data);
+            Message message = jsonToMessage(jsonObject);
+            //ChangesStorageUtil.addMessage();
+        } catch (ParseException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            logger.error("Invalid message");
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doDelete(request, response);
+    }
+
     @SuppressWarnings("unchecked")
     private String serverResponse(int index) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put(MESSAGES, MessageStorage.getSubHistory(index));
-        jsonObject.put(TOKEN, getToken(MessageStorage.getSize()));
+        jsonObject.put(MESSAGES, ChangesStorageUtil.getSubHistory(index));
+        jsonObject.put(TOKEN, getToken(ChangesStorageUtil.getSize()));
         return jsonObject.toJSONString();
     }
 
@@ -90,8 +110,8 @@ public class MessageServlet extends HttpServlet {
         if (!MessageXMLParser.isStorageExist()) {
             MessageXMLParser.createStorage();
         } else {
-            MessageStorage.addAll(MessageXMLParser.getMessages());
-            logger.info('\n' + MessageStorage.getStringView());
+            ChangesStorageUtil.addAll(MessageXMLParser.getMessages());
+            logger.info('\n' + ChangesStorageUtil.getStringView());
         }
     }
 }

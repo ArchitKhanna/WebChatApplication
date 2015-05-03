@@ -1,5 +1,7 @@
 package bsu.fpmi.chat.model;
 
+import bsu.fpmi.chat.util.MessageUtil;
+
 /**
  * Created by Gennady Trubach on 28.03.2015.
  * FAMCS 2d course 5th group
@@ -23,7 +25,7 @@ public class Message {
 
     public void modify(String newMessageText) {
         messageText = newMessageText;
-       // modifyDate = GeneratorFactory.generateCurrentDate();
+        modifyDate = MessageUtil.generateCurrentDate();
     }
 
     public void delete() {

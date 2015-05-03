@@ -44,7 +44,7 @@ public final class MessageUtil {
         return String.valueOf(Math.abs(currentDate * random.nextLong() % LIMIT));
     }
 
-    private static String generateCurrentDate() {
+    public static String generateCurrentDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy, HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Minsk"));
         return dateFormat.format(new Date());

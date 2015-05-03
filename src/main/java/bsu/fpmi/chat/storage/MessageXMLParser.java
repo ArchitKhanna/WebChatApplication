@@ -3,6 +3,8 @@ package bsu.fpmi.chat.storage;
 import bsu.fpmi.chat.model.Message;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -15,6 +17,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -132,6 +135,51 @@ public final class MessageXMLParser {
             }
         }
         return messages;
+    }
+
+    public static synchronized Message updateMessage(Message message) throws ParserConfigurationException, IOException,
+            SAXException, XPathExpressionException, TransformerException {
+        DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+        Document document = documentBuilder.parse(XML_LOCATION);
+        Node messageToUpdate = getNodeById(document, message.getID());
+        NodeList nodeList = messageToUpdate.getChildNodes();
+
+        String senderName = null;
+        String sendDate = null;
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+
+            if (SENDER_NAME.equals(node.getNodeName())) {
+                senderName = node.getTextContent();
+            }
+            if (MESSAGE_TEXT.equals(node.getNodeName())) {
+                node.setTextContent(message.getMessageText());
+            }
+            if (SEND_DATE.equals(node.getNodeName())) {
+                sendDate = node.getTextContent();
+            }
+            if (MODIFY_DATE.equals(node.getNodeName())) {
+                node.setTextContent(message.getModifyDate());
+            }
+            if (DELETED.equals(node.getNodeName())) {
+                node.setTextContent(Boolean.toString(message.isDeleted()));
+            }
+        }
+
+        Transformer transformer = getTransformer();
+        DOMSource source = new DOMSource(document);
+        StreamResult result = new StreamResult(XML_LOCATION);
+        transformer.transform(source, result);
+
+        return new Message(message.getID(), senderName, message.getMessageText(), sendDate, message.getModifyDate(),
+                message.isDeleted());
+    }
+
+    private static Node getNodeById(Document document, String id) throws XPathExpressionException {
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        XPathExpression xPathExpression = xPath.compile("//" + MESSAGE + "[@id='" + id + "']");
+        return (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
     }
 
     private static Transformer getTransformer() throws TransformerConfigurationException {

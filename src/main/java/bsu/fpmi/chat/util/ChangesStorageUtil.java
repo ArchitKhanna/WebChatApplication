@@ -1,4 +1,6 @@
-package bsu.fpmi.chat.model;
+package bsu.fpmi.chat.util;
+
+import bsu.fpmi.chat.model.Message;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,10 +10,10 @@ import java.util.List;
  * Created by Gennady Trubach on 21.04.2015.
  * FAMCS 2d course 5th group
  */
-public final class MessageStorage {
+public final class ChangesStorageUtil {
     private static final List<Message> HISTORY = Collections.synchronizedList(new ArrayList<Message>());
 
-    private MessageStorage() {
+    private ChangesStorageUtil() {
     }
 
     public static List<Message> getStorage() {

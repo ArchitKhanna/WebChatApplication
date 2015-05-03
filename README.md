@@ -13,7 +13,7 @@ Repository for studying practise in Belarussian State University.
 1. Go to Run->Edit Configurations.
 2. Add New Configuration->Tomcat Server->Local.
 3. Go to Run->Edit Configurations->Deployment.
-4. Add artifact and change application context(or war files decompressed into ROOT folder in Tomcat->webapps.
+4. Add artifact and change application context(or war files decompressed into ROOT folder in Tomcat->webapps).
 
 ## Current state of project
 
