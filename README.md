@@ -13,10 +13,11 @@ Repository for studying practise in Belarussian State University.
 1. Go to Run->Edit Configurations.
 2. Add New Configuration->Tomcat Server->Local.
 3. Go to Run->Edit Configurations->Deployment.
-4. Add artifact and change application context(or war files decompressed into ROOT folder in Tomcat->webapps).
+4. Add artifact and change application context (or war files decompressed into ROOT folder in Tomcat->webapps).
 
 ## Current state of project
 
-* **Task 10** :
+* Task 10 :
 The xml history is stored in your home directory. Please, before running server, put file history.xml to your home directory (to know your home directory open command promt and paste `echo %USERPROFILE%`).
 <br />For writing history to xml used DOM parser, for parsing from xml used STAX parser.
+* **Task 11**
