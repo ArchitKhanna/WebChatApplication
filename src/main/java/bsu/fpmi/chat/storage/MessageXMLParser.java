@@ -144,38 +144,41 @@ public final class MessageXMLParser {
         DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
         Document document = documentBuilder.parse(XML_LOCATION);
         Node messageToUpdate = getNodeById(document, message.getID());
-        NodeList nodeList = messageToUpdate.getChildNodes();
-
         String senderName = null;
         String sendDate = null;
-        for (int i = nodeList.getLength()-1; i >=0; i--) {
-            Node node = nodeList.item(i);
+        if(messageToUpdate!=null) {
+            NodeList nodeList = messageToUpdate.getChildNodes();
+            for (int i = nodeList.getLength() - 1; i >= 0; i--) {
+                Node node = nodeList.item(i);
 
-            if (SENDER_NAME.equals(node.getNodeName())) {
-                senderName = node.getTextContent();
-            }
-            if (MESSAGE_TEXT.equals(node.getNodeName())) {
-                node.setTextContent(message.getMessageText());
-            }
-            if (SEND_DATE.equals(node.getNodeName())) {
-                sendDate = node.getTextContent();
-            }
-            if (MODIFY_DATE.equals(node.getNodeName())) {
-                node.setTextContent(message.getModifyDate());
-            }
-            if (DELETED.equals(node.getNodeName())) {
-                if (Boolean.valueOf(node.getTextContent())) {
-                    throw new ModifyException();
+                if (SENDER_NAME.equals(node.getNodeName())) {
+                    senderName = node.getTextContent();
                 }
-                node.setTextContent(Boolean.toString(message.isDeleted()));
+                if (MESSAGE_TEXT.equals(node.getNodeName())) {
+                    node.setTextContent(message.getMessageText());
+                }
+                if (SEND_DATE.equals(node.getNodeName())) {
+                    sendDate = node.getTextContent();
+                }
+                if (MODIFY_DATE.equals(node.getNodeName())) {
+                    node.setTextContent(message.getModifyDate());
+                }
+                if (DELETED.equals(node.getNodeName())) {
+                    if (Boolean.valueOf(node.getTextContent())) {
+                        throw new ModifyException();
+                    }
+                    node.setTextContent(Boolean.toString(message.isDeleted()));
+                }
             }
+
+            Transformer transformer = getTransformer();
+            DOMSource source = new DOMSource(document);
+            StreamResult result = new StreamResult(XML_LOCATION);
+            transformer.transform(source, result);
         }
-
-        Transformer transformer = getTransformer();
-        DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(XML_LOCATION);
-        transformer.transform(source, result);
-
+        else {
+            throw new NullPointerException();
+        }
         return new Message(message.getID(), senderName, message.getMessageText(), sendDate, message.getModifyDate(), message.isDeleted());
     }
 

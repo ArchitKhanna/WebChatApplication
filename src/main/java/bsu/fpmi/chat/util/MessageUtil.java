@@ -69,9 +69,12 @@ public final class MessageUtil {
     public static Message jsonToCurrentMessage(JSONObject jsonObject) {
         Object id = jsonObject.get(ID);
         Object messageText = jsonObject.get(MESSAGE_TEXT);
-        Object isDeleted = jsonObject.get(DELETED);
+        Object modifyDate = jsonObject.get(DELETED);
+        if (modifyDate == null) {
+            modifyDate = NOT_MODIFIED;
+        }
         if (id != null) {
-            return new Message((String) id, null, (String) messageText, null, null, (Boolean) isDeleted);
+            return new Message((String) id, null, (String) messageText, null, (String) modifyDate, Boolean.FALSE);
         }
         return null;
     }
