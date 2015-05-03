@@ -1,0 +1,33 @@
+.page {
+    background: url("../images/background.jpg") #91E4FB;
+    text-align: center;
+}
+.logo {
+    margin-top: 27px;
+    text-align: center;
+    padding: 0;
+}
+.picture {
+    margin-top: 40px;
+    text-align: center;
+}
+.header {
+    margin-top: 40px;
+    text-align: center;
+    font: bold 54px Georgia, Times, serif;
+    color: #333;
+    line-height: 90%;
+    letter-spacing: -2px
+}
+.paragraph {
+    margin-top: 40px;
+    text-align: center;
+    color: #647283;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: 25px;
+}
+.footer {
+    margin: 40px;
+    text-align: center;
+    font-size: 18px
+}
