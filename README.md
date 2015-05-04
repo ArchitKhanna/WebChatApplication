@@ -26,6 +26,9 @@ The xml history is stored in your home directory. Please, before running server,
 For writing history to xml used DOM parser, for parsing from xml used STAX parser.
 * **Task 11** :
 Now editing and deleting messages are available. How to see web exceptions (400, 404, 500) in your browser : 
-    * 400 - Write /WebChatApplication/chat in url (f. e. `http://localhost:8080/WebChatApplication/chat`)
-    * 404 - Write after mask /WebChatApplication/ something wrong (f. e. `http://localhost:8080/WebChatApplication/hub`)
-    * 500 - Write after mask /WebChatApplication/ something wrong (f. e. `http://localhost:8080/WebChatApplication/chat?token=XXX`)
+    * 400 - Write /WebChatApplication/chat in url  
+    (f. e. `http://localhost:8080/WebChatApplication/chat`)
+    * 404 - Write after mask /WebChatApplication/ something wrong  
+    (f. e. `http://localhost:8080/WebChatApplication/hub`)
+    * 500 - Write after mask /WebChatApplication/ something wrong  
+    (f. e. `http://localhost:8080/WebChatApplication/chat?token=XXX`)
