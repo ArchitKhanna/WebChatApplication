@@ -9,7 +9,7 @@
 <html>
 <head>
     <title>400 Bad Request</title>
-    <link rel="stylesheet" type="text/css" href=href="resources/css/exceptionStyle.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/exceptionStyle.css">
 </head>
 <body class="page">
 <div class="logo">
