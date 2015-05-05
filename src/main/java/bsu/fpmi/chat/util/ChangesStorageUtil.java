@@ -16,10 +16,6 @@ public final class ChangesStorageUtil {
     private ChangesStorageUtil() {
     }
 
-    public static List<Message> getStorage() {
-        return HISTORY;
-    }
-
     public static void addMessage(Message message) {
         HISTORY.add(message);
     }
@@ -34,15 +30,6 @@ public final class ChangesStorageUtil {
 
     public static List<Message> getSubHistory(int index) {
         return HISTORY.subList(index, HISTORY.size());
-    }
-
-    public static Message getMessageById(String id) {
-        for (Message message : HISTORY) {
-            if (id.equals(message.getID())) {
-                return message;
-            }
-        }
-        return null;
     }
 
     public static String getStringView() {
