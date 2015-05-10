@@ -24,7 +24,7 @@ You can use [dillinger.io](http://dillinger.io/). For learn how to write in mark
 * Task 10 :
 The xml history is stored in your home directory. Please, before running server, put file history.xml to your home directory (to know your home directory open command promt and paste `echo %USERPROFILE%`).  
 For writing history to xml used DOM parser, for parsing from xml used STAX parser.
-* **Task 11** :
+* Task 11 :
 Now editing and deleting messages are available. How to see web exceptions (400, 404, 500) in your browser : 
     * 400 - Write /WebChatApplication/chat in url  
     (f. e. `http://localhost:8080/WebChatApplication/chat`)
@@ -32,3 +32,4 @@ Now editing and deleting messages are available. How to see web exceptions (400,
     (f. e. `http://localhost:8080/WebChatApplication/hub`)
     * 500 - Write after mask /WebChatApplication/ something wrong  
     (f. e. `http://localhost:8080/WebChatApplication/chat?token=XXX`)
+* **Task12**
