@@ -56,26 +56,26 @@ public final class MessageUtil {
         return (JSONObject) jsonParser.parse(data.trim());
     }
 
-    public static Message jsonToNewMessage(JSONObject jsonObject) {
+    public static Message jsonToNewMessage(JSONObject jsonObject) throws NullPointerException{
         Object senderName = jsonObject.get(SENDER_NAME);
         Object messageText = jsonObject.get(MESSAGE_TEXT);
-        if (senderName != null && messageText != null) {
-            return new Message(generateId(), (String) senderName, (String) messageText, generateCurrentDate(),
-                    NOT_MODIFIED, Boolean.FALSE);
+        if (senderName == null || messageText == null) {
+            throw new NullPointerException();
         }
-        return null;
+        return new Message(generateId(), (String) senderName, (String) messageText, generateCurrentDate(), NOT_MODIFIED,
+                Boolean.FALSE);
     }
 
-    public static Message jsonToCurrentMessage(JSONObject jsonObject) {
+    public static Message jsonToCurrentMessage(JSONObject jsonObject) throws NullPointerException{
         Object id = jsonObject.get(ID);
         Object messageText = jsonObject.get(MESSAGE_TEXT);
         Object modifyDate = jsonObject.get(DELETED);
         if (modifyDate == null) {
             modifyDate = NOT_MODIFIED;
         }
-        if (id != null) {
-            return new Message((String) id, null, (String) messageText, null, (String) modifyDate, Boolean.FALSE);
+        if (id == null) {
+            throw new NullPointerException();
         }
-        return null;
+        return new Message((String) id, null, (String) messageText, null, (String) modifyDate, Boolean.FALSE);
     }
 }
