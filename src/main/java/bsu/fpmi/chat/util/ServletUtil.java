@@ -11,6 +11,11 @@ import java.io.IOException;
 public final class ServletUtil {
     public static final String APPLICATION_JSON = "application/json";
     public static final String UTF_8 = "UTF-8";
+    public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
+    public static final String LAST_MODIFIED = "Last-Modified";
+    //public static final String EXPIRES = "Expires";
+//    public static final int CACHE_DURATION_IN_SECOND = 60 * 60 * 24 * 2; // 2 days
+    public static final long MILLISECONDS = 1000;
 
     private ServletUtil() {
     }

@@ -23,7 +23,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -198,5 +200,10 @@ public final class MessageXMLParser {
     public static synchronized boolean isStorageExist() {
         File file = new File(XML_LOCATION);
         return file.exists();
+    }
+
+    public static synchronized long getLastModifyDate() {
+        File file = new File(XML_LOCATION);
+        return file.lastModified();
     }
 }

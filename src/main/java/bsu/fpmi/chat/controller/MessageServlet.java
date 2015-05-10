@@ -4,6 +4,7 @@ import bsu.fpmi.chat.exception.ModifyException;
 import bsu.fpmi.chat.model.Message;
 import bsu.fpmi.chat.util.ChangesStorageUtil;
 import bsu.fpmi.chat.storage.MessageXMLParser;
+import bsu.fpmi.chat.util.ServletUtil;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -23,8 +24,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static bsu.fpmi.chat.util.MessageUtil.*;
-import static bsu.fpmi.chat.util.ServletUtil.APPLICATION_JSON;
-import static bsu.fpmi.chat.util.ServletUtil.getMessageBody;
+import static bsu.fpmi.chat.util.ServletUtil.*;
 
 /**
  * Created by Gennady Trubach on 21.04.2015.
@@ -46,17 +46,31 @@ public class MessageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //logger.info("Get request");
         String token = request.getParameter(TOKEN);
-        if (token != null && !"".equals(token)) {
-            int index = getIndex(token);
-            String messages = serverResponse(index);
-            response.setContentType(APPLICATION_JSON);
-            PrintWriter pw = response.getWriter();
-            pw.print(messages);
-            pw.flush();
+        //logger.info("Request token : " + token);
+        long lastModified = request.getDateHeader(IF_MODIFIED_SINCE);
+        if (lastModified != -1 && Math.abs(lastModified - MessageXMLParser.getLastModifyDate()) < MILLISECONDS) {
+            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            logger.info("History not modified - 304");
         } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "token parameter is absent");
-            logger.error("Token parameter is absent");
+            if (token != null && !"".equals(token)) {
+                int index = getIndex(token);
+                //logger.info("Index : " + index);
+                String messages = serverResponse(index);
+                response.setContentType(APPLICATION_JSON);
+                response.setCharacterEncoding(UTF_8);
+                //response.addHeader(CACHE_CONTROL, "max-age=" + CACHE_DURATION_IN_SECOND);
+                lastModified = MessageXMLParser.getLastModifyDate();
+                response.setDateHeader(LAST_MODIFIED, lastModified);
+                //response.setDateHeader(EXPIRES, System.currentTimeMillis() + CACHE_DURATION_IN_MS);
+                PrintWriter pw = response.getWriter();
+                pw.print(messages);
+                pw.flush();
+            } else {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "token parameter is absent");
+                logger.error("Token parameter is absent");
+            }
         }
     }
 
@@ -72,7 +86,7 @@ public class MessageServlet extends HttpServlet {
             MessageXMLParser.addMessage(message);
             ChangesStorageUtil.addMessage(message);
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (ParseException | ParserConfigurationException | SAXException | TransformerException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
         }

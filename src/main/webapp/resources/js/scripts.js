@@ -8,8 +8,9 @@ var chatState = {
     currentUser: null,
     messageList: [],
     token: 'TN11EN',
-    isAvailable: false
-};
+    isAvailable: false,
+    actualDate: null
+}
 
 function run() {
     var appContainer = document.getElementsByClassName('wrapper')[0];
@@ -405,10 +406,13 @@ function ajax(method, url, data, continueWith, continueWithError) {
     var xhr = new XMLHttpRequest();
     continueWithError = continueWithError || defaultErrorHandler;
     xhr.open(method || 'GET', url, true);
+    if (method == "GET" && chatState.actualDate != null) {
+        xhr.setRequestHeader("If-Modified-Since", chatState.actualDate);
+    }
     xhr.onload = function () {
         if (xhr.readyState !== 4)
             return;
-        if (xhr.status != 200) {
+        if (xhr.status != 200 && xhr.status != 304) {
             serverAvailable(false, method);
             continueWithError('Error on the server side, response ' + xhr.status);
             return;
@@ -419,6 +423,10 @@ function ajax(method, url, data, continueWith, continueWithError) {
             return;
         }
         serverAvailable(true, method);
+        var lastModified = xhr.getResponseHeader("Last-Modified");
+        if (lastModified != -1) {
+            chatState.actualDate = lastModified;
+        }
         continueWith(xhr.responseText);
     };
     xhr.ontimeout = function () {
