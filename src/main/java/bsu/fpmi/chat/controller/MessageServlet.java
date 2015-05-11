@@ -46,9 +46,9 @@ public class MessageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //logger.info("Get request");
+        logger.info("Get request");
         String token = request.getParameter(TOKEN);
-        //logger.info("Request token : " + token);
+        logger.info("Request token : " + token);
         long lastModified = request.getDateHeader(IF_MODIFIED_SINCE);
         if (lastModified != -1 && Math.abs(lastModified - MessageXMLParser.getLastModifyDate()) < MILLISECONDS) {
             response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -56,14 +56,12 @@ public class MessageServlet extends HttpServlet {
         } else {
             if (token != null && !"".equals(token)) {
                 int index = getIndex(token);
-                //logger.info("Index : " + index);
+                logger.info("Index : " + index);
                 String messages = serverResponse(index);
                 response.setContentType(APPLICATION_JSON);
                 response.setCharacterEncoding(UTF_8);
-                //response.addHeader(CACHE_CONTROL, "max-age=" + CACHE_DURATION_IN_SECOND);
                 lastModified = MessageXMLParser.getLastModifyDate();
                 response.setDateHeader(LAST_MODIFIED, lastModified);
-                //response.setDateHeader(EXPIRES, System.currentTimeMillis() + CACHE_DURATION_IN_MS);
                 PrintWriter pw = response.getWriter();
                 pw.print(messages);
                 pw.flush();

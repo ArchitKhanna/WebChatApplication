@@ -340,9 +340,11 @@ function restoreMessages(continueWith) {
 }
 
 function getHistory(responseText, continueWith) {
-    var response = JSON.parse(responseText);
-    chatState.token = response.token;
-    createOrUpdateMessages(response.messages);
+    if (responseText != "") {
+        var response = JSON.parse(responseText);
+        chatState.token = response.token;
+        createOrUpdateMessages(response.messages);
+    }
     continueWith && continueWith();
 }
 
@@ -406,9 +408,6 @@ function ajax(method, url, data, continueWith, continueWithError) {
     var xhr = new XMLHttpRequest();
     continueWithError = continueWithError || defaultErrorHandler;
     xhr.open(method || 'GET', url, true);
-    if (method == "GET" && chatState.actualDate != null) {
-        xhr.setRequestHeader("If-Modified-Since", chatState.actualDate);
-    }
     xhr.onload = function () {
         if (xhr.readyState !== 4)
             return;
@@ -417,7 +416,7 @@ function ajax(method, url, data, continueWith, continueWithError) {
             continueWithError('Error on the server side, response ' + xhr.status);
             return;
         }
-        if (isError(xhr.responseText)) {
+        if (isError(xhr.responseText)&& xhr.status != 304) {
             serverAvailable(false, method);
             continueWithError('Error on the server side, response ' + xhr.responseText);
             return;
@@ -443,6 +442,9 @@ function ajax(method, url, data, continueWith, continueWithError) {
 
         continueWithError(errMsg);
     };
+    if (method == "GET" && chatState.actualDate != null) {
+        xhr.setRequestHeader("If-Modified-Since", chatState.actualDate);
+    }
     xhr.send(data);
 }
 
