@@ -2,6 +2,7 @@ package bsu.fpmi.chat.controller;
 
 import bsu.fpmi.chat.exception.ModifyException;
 import bsu.fpmi.chat.model.Message;
+import bsu.fpmi.chat.proccesor.AsyncProcessor;
 import bsu.fpmi.chat.util.ChangesStorageUtil;
 import bsu.fpmi.chat.storage.MessageXMLParser;
 import bsu.fpmi.chat.util.ServletUtil;
@@ -10,6 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.xml.sax.SAXException;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,7 +32,7 @@ import static bsu.fpmi.chat.util.ServletUtil.*;
  * Created by Gennady Trubach on 21.04.2015.
  * FAMCS 2d course 5th group
  */
-@WebServlet("/chat")
+@WebServlet(urlPatterns = "/chat", asyncSupported = true)
 public class MessageServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
@@ -47,7 +49,7 @@ public class MessageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Get request");
-        String token = request.getParameter(TOKEN);
+        /*String token = request.getParameter(TOKEN);
         logger.info("Request token : " + token);
         long lastModified = request.getDateHeader(IF_MODIFIED_SINCE);
         if (lastModified != -1 && Math.abs(lastModified - MessageXMLParser.getLastModifyDate()) < MILLISECONDS) {
@@ -69,7 +71,10 @@ public class MessageServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "token parameter is absent");
                 logger.error("Token parameter is absent");
             }
-        }
+        }*/
+        final AsyncContext asyncContext = request.startAsync();
+        asyncContext.setTimeout(100000);
+        AsyncProcessor.addAsyncContext(asyncContext);
     }
 
     @Override
@@ -82,7 +87,8 @@ public class MessageServlet extends HttpServlet {
             Message message = jsonToNewMessage(jsonObject);
             logger.info(message.getReadableView());
             MessageXMLParser.addMessage(message);
-            ChangesStorageUtil.addMessage(message);
+            //ChangesStorageUtil.addMessage(message);
+            AsyncProcessor.notifyAllClients(serverResponse(message));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -101,7 +107,9 @@ public class MessageServlet extends HttpServlet {
             message = jsonToCurrentMessage(jsonObject);
             message.setModified();
             Message updatedMessage = MessageXMLParser.updateMessage(message);
-            ChangesStorageUtil.addMessage(updatedMessage);
+            //ChangesStorageUtil.addMessage(updatedMessage);
+            AsyncProcessor.notifyAllClients(serverResponse(updatedMessage));
+            response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
                 NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -123,7 +131,9 @@ public class MessageServlet extends HttpServlet {
             message = jsonToCurrentMessage(jsonObject);
             message.delete();
             Message updatedMessage = MessageXMLParser.updateMessage(message);
-            ChangesStorageUtil.addMessage(updatedMessage);
+            //ChangesStorageUtil.addMessage(updatedMessage);
+            AsyncProcessor.notifyAllClients(serverResponse(updatedMessage));
+            response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
                 NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -134,11 +144,16 @@ public class MessageServlet extends HttpServlet {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    /*@SuppressWarnings("unchecked")
     private String serverResponse(int index) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(MESSAGES, ChangesStorageUtil.getSubHistory(index));
         jsonObject.put(TOKEN, getToken(ChangesStorageUtil.getSize()));
+        return jsonObject.toJSONString();
+    }*/
+    private String serverResponse(Message message) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(MESSAGES, message);
         return jsonObject.toJSONString();
     }
 
@@ -148,7 +163,7 @@ public class MessageServlet extends HttpServlet {
         if (!MessageXMLParser.isStorageExist()) {
             MessageXMLParser.createStorage();
         } else {
-            ChangesStorageUtil.addAll(MessageXMLParser.getMessages());
+            //ChangesStorageUtil.addAll(MessageXMLParser.getMessages());
             logger.info('\n' + ChangesStorageUtil.getStringView());
         }
     }
