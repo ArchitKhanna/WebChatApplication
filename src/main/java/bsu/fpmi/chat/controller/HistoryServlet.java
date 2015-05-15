@@ -2,8 +2,6 @@ package bsu.fpmi.chat.controller;
 
 import bsu.fpmi.chat.model.Message;
 import bsu.fpmi.chat.storage.MessageXMLParser;
-import bsu.fpmi.chat.util.ChangesStorageUtil;
-import bsu.fpmi.chat.util.ServletUtil;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
@@ -72,7 +70,9 @@ public class HistoryServlet extends HttpServlet {
         if (!MessageXMLParser.isStorageExist()) {
             MessageXMLParser.createStorage();
         } else {
-            logger.info('\n' + ChangesStorageUtil.getStringView());
+            for (Message message : MessageXMLParser.getMessages()) {
+                logger.info(message.getReadableView());
+            }
         }
     }
 }

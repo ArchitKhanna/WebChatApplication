@@ -3,9 +3,7 @@ package bsu.fpmi.chat.controller;
 import bsu.fpmi.chat.exception.ModifyException;
 import bsu.fpmi.chat.model.Message;
 import bsu.fpmi.chat.proccesor.AsyncProcessor;
-import bsu.fpmi.chat.util.ChangesStorageUtil;
 import bsu.fpmi.chat.storage.MessageXMLParser;
-import bsu.fpmi.chat.util.ServletUtil;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -23,7 +21,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import static bsu.fpmi.chat.util.MessageUtil.*;
 import static bsu.fpmi.chat.util.ServletUtil.*;
@@ -49,29 +46,6 @@ public class MessageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Get request");
-        /*String token = request.getParameter(TOKEN);
-        logger.info("Request token : " + token);
-        long lastModified = request.getDateHeader(IF_MODIFIED_SINCE);
-        if (lastModified != -1 && Math.abs(lastModified - MessageXMLParser.getLastModifyDate()) < MILLISECONDS) {
-            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-            logger.info("History not modified - 304");
-        } else {
-            if (token != null && !"".equals(token)) {
-                int index = getIndex(token);
-                logger.info("Index : " + index);
-                String messages = serverResponse(index);
-                response.setContentType(APPLICATION_JSON);
-                response.setCharacterEncoding(UTF_8);
-                lastModified = MessageXMLParser.getLastModifyDate();
-                response.setDateHeader(LAST_MODIFIED, lastModified);
-                PrintWriter pw = response.getWriter();
-                pw.print(messages);
-                pw.flush();
-            } else {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "token parameter is absent");
-                logger.error("Token parameter is absent");
-            }
-        }*/
         final AsyncContext asyncContext = request.startAsync();
         asyncContext.setTimeout(100000);
         AsyncProcessor.addAsyncContext(asyncContext);
@@ -87,7 +61,6 @@ public class MessageServlet extends HttpServlet {
             Message message = jsonToNewMessage(jsonObject);
             logger.info(message.getReadableView());
             MessageXMLParser.addMessage(message);
-            //ChangesStorageUtil.addMessage(message);
             AsyncProcessor.notifyAllClients(serverResponse(message));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException | NullPointerException e) {
@@ -107,7 +80,6 @@ public class MessageServlet extends HttpServlet {
             message = jsonToCurrentMessage(jsonObject);
             message.setModified();
             Message updatedMessage = MessageXMLParser.updateMessage(message);
-            //ChangesStorageUtil.addMessage(updatedMessage);
             AsyncProcessor.notifyAllClients(serverResponse(updatedMessage));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
@@ -131,7 +103,6 @@ public class MessageServlet extends HttpServlet {
             message = jsonToCurrentMessage(jsonObject);
             message.delete();
             Message updatedMessage = MessageXMLParser.updateMessage(message);
-            //ChangesStorageUtil.addMessage(updatedMessage);
             AsyncProcessor.notifyAllClients(serverResponse(updatedMessage));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
@@ -144,13 +115,6 @@ public class MessageServlet extends HttpServlet {
         }
     }
 
-    /*@SuppressWarnings("unchecked")
-    private String serverResponse(int index) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(MESSAGES, ChangesStorageUtil.getSubHistory(index));
-        jsonObject.put(TOKEN, getToken(ChangesStorageUtil.getSize()));
-        return jsonObject.toJSONString();
-    }*/
     private String serverResponse(Message message) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(MESSAGES, message);
@@ -163,8 +127,9 @@ public class MessageServlet extends HttpServlet {
         if (!MessageXMLParser.isStorageExist()) {
             MessageXMLParser.createStorage();
         } else {
-            //ChangesStorageUtil.addAll(MessageXMLParser.getMessages());
-            logger.info('\n' + ChangesStorageUtil.getStringView());
+            for (Message message : MessageXMLParser.getMessages()) {
+                logger.info(message.getReadableView());
+            }
         }
     }
 }
