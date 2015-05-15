@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
 
 import static bsu.fpmi.chat.util.MessageUtil.*;
 import static bsu.fpmi.chat.util.ServletUtil.*;
@@ -117,7 +118,7 @@ public class MessageServlet extends HttpServlet {
 
     private String serverResponse(Message message) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put(MESSAGES, message);
+        jsonObject.put(MESSAGES, Collections.singletonList(message));
         return jsonObject.toJSONString();
     }
 

@@ -24,7 +24,7 @@ import static bsu.fpmi.chat.util.ServletUtil.UTF_8;
 /**
  * Created by gtrubach on 15.05.2015.
  */
-@WebServlet(urlPatterns = "/chat")
+@WebServlet(urlPatterns = "/restore")
 public class HistoryServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
@@ -40,20 +40,13 @@ public class HistoryServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Get request in history restore");
-        //String token = request.getParameter(TOKEN);
-        //logger.info("Request token : " + token);
         try {
-            if (true) {//token != null && !"".equals(token)) {
-                String messages = serverResponse();
-                response.setContentType(APPLICATION_JSON);
-                response.setCharacterEncoding(UTF_8);
-                PrintWriter pw = response.getWriter();
-                pw.print(messages);
-                pw.flush();
-            } else {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "token parameter is absent");
-                logger.error("Token parameter is absent");
-            }
+            String messages = serverResponse();
+            response.setContentType(APPLICATION_JSON);
+            response.setCharacterEncoding(UTF_8);
+            PrintWriter pw = response.getWriter();
+            pw.print(messages);
+            pw.flush();
         } catch (XMLStreamException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }

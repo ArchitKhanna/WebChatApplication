@@ -8,9 +8,8 @@ var chatState = {
     currentUser: null,
     messageList: [],
     token: 'TN11EN',
-    isAvailable: false,
-    actualDate: null
-}
+    isAvailable: false
+};
 
 function run() {
     var appContainer = document.getElementsByClassName('wrapper')[0];
@@ -18,7 +17,7 @@ function run() {
     appContainer.addEventListener('keydown', delegateEvent);
     var currentUser = restoreCurrentUser();
     setCurrentUser(currentUser);
-    //restoreMessages();
+    restoreMessages();
     poll();
 }
 
@@ -330,20 +329,29 @@ function restoreCurrentUser() {
 }
 
 function restoreMessages(continueWith) {
-    var url = chatState.chatUrl + '?token=' + chatState.token;
-    getRequest(url, function (responseText) {
-        getHistory(responseText, function () {
-            setTimeout(function () {
-                restoreMessages(continueWith);
-            }, 1000);
-        });
+    $.ajax({
+        url : "restore",
+        success : function(data) {
+            getHistory(data);
+        },
+        dataType : "json"
+    });
+}
+
+function poll() {
+    $.ajax({
+        url : chatState.chatUrl,
+        success : function(data) {
+            getHistory(data);
+        },
+        dataType : "json",
+        complete : poll,
+        timeout : 30000
     });
 }
 
 function getHistory(response, continueWith) {
     if (response != "") {
-       // var response = JSON.parse(responseText);
-        //chatState.token = response.token;
         createOrUpdateMessages(response.messages);
     }
     continueWith && continueWith();
@@ -405,18 +413,6 @@ function isError(text) {
     return !!obj.error;
 }
 
-function poll() {
-    $.ajax({
-        url : chatState.chatUrl,
-        success : function(data) {
-            getHistory(data);
-        },
-        dataType : "json",
-        complete : poll,
-        timeout : 30000
-    });
-}
-
 function ajax(method, url, data, continueWith, continueWithError) {
     var xhr = new XMLHttpRequest();
     continueWithError = continueWithError || defaultErrorHandler;
@@ -435,10 +431,6 @@ function ajax(method, url, data, continueWith, continueWithError) {
             return;
         }
         serverAvailable(true, method);
-        /*var lastModified = xhr.getResponseHeader("Last-Modified");
-        if (lastModified != -1) {
-            chatState.actualDate = lastModified;
-        }*/
         continueWith(xhr.responseText);
     };
     xhr.ontimeout = function () {
@@ -455,9 +447,6 @@ function ajax(method, url, data, continueWith, continueWithError) {
 
         continueWithError(errMsg);
     };
-    /*if (method == "GET" && chatState.actualDate != null) {
-        xhr.setRequestHeader("If-Modified-Since", chatState.actualDate);
-    }*/
     xhr.send(data);
 }
 
