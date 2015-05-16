@@ -8,6 +8,9 @@ import java.io.PrintWriter;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static bsu.fpmi.chat.util.ServletUtil.APPLICATION_JSON;
+import static bsu.fpmi.chat.util.ServletUtil.UTF_8;
+
 /**
  * Created by gtrubach on 11.05.2015.
  */
@@ -17,6 +20,8 @@ public final class AsyncProcessor {
     public static void notifyAllClients(String data) {
         for (AsyncContext asyncContext : storage) {
             try {
+                asyncContext.getResponse().setContentType(APPLICATION_JSON);
+                asyncContext.getResponse().setCharacterEncoding(UTF_8);
                 final PrintWriter writer = asyncContext.getResponse().getWriter();
                 writer.println(data);
                 writer.flush();
@@ -55,5 +60,4 @@ public final class AsyncProcessor {
     private static void removeAsyncContext(AsyncContext context) {
         storage.remove(context);
     }
-
 }
