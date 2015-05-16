@@ -148,7 +148,7 @@ public final class MessageXMLParser {
         Node messageToUpdate = getNodeById(document, message.getID());
         String senderName = null;
         String sendDate = null;
-        if(messageToUpdate!=null) {
+        if (messageToUpdate != null) {
             NodeList nodeList = messageToUpdate.getChildNodes();
             for (int i = nodeList.getLength() - 1; i >= 0; i--) {
                 Node node = nodeList.item(i);
@@ -177,8 +177,7 @@ public final class MessageXMLParser {
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(XML_LOCATION);
             transformer.transform(source, result);
-        }
-        else {
+        } else {
             throw new NullPointerException();
         }
         return new Message(message.getID(), senderName, message.getMessageText(), sendDate, message.getModifyDate(), message.isDeleted());
