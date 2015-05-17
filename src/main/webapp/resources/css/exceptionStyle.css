@@ -1,14 +1,24 @@
 .page {
-    background: url("../images/background.jpg") #91E4FB;
+    background: #D4E3FC;
     text-align: center;
+    margin: 0;
+}
+.page-head {
+    background: #C0C0C0;
+    width: 100%;
+    min-width: 350px;
+    height: 5em;
+    position: relative;
+    -webkit-user-select: none;
 }
 .logo {
-    margin-top: 27px;
-    text-align: center;
-    padding: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 .picture {
-    margin-top: 40px;
+    margin-top: 50px;
     text-align: center;
 }
 .header {

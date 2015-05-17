@@ -12,8 +12,10 @@
   <link rel="stylesheet" type="text/css" href="resources/css/exceptionStyle.css">
 </head>
 <body class="page">
-<div class="logo">
-  <img src="resources/images/logo.png" alt="MyChat">
+<div class="page-head">
+    <div class="logo">
+        <img src="resources/images/logo.png" alt="MyChat">
+    </div>
 </div>
 <div class="picture">
     <a href="http://www.nickjr.com/kids-games/casa-de-dora.html" target="_blank">

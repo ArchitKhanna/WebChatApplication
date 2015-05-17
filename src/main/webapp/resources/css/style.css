@@ -1,35 +1,43 @@
 .page {
-    background: url("../images/background.jpg") #91E4FB;
+    background: #D4E3FC;
     text-align: center;
+    margin: 0;
 }
 .page-head {
-    margin: 27px auto 0;
+    background: #C0C0C0;
+    width: 100%;
     min-width: 350px;
-    text-align: center;
-    user-select: none;
+    height: 5em;
+    position: relative;
     -webkit-user-select: none;
 }
+.head-wrapper {
+    width: 350px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 .head-logo {
-    font-size: 50px;
-    display: inline-block;
-    vertical-align: middle;
+    float: left;
 }
 .indication-circle {
-    display: inline-block;
+    position: absolute;
     width: 20px;
     height: 20px;
+    top: 50%;
+    right: 0;
     background: #E61610;
     border-radius: 10px;
-    vertical-align: middle;
+    transform: translate(-50%, -50%);
 }
 .wrapper {
-    margin: auto;
+    margin: 50px auto;
     max-width: 60%;
     min-width: 350px;
 }
 .sign {
     text-align: right;
-    user-select: none;
     -webkit-user-select: none;
 }
 #sign-name {
