@@ -1,3 +1,4 @@
 use chat;
 
-select * from messages join users on users.id = messages.user_id where users.name = 'Shyshpanchik' and messages.text like "%hello%";
+select * from messages where messages.user_id = (select users.id from users where users.name = 'Shyshpanchik')
+and messages.text like "%hello%";

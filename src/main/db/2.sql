@@ -1,3 +1,3 @@
 use chat;
 
-select * from messages join users on users.id = messages.user_id where users.name = 'Tester';
+select * from messages where messages.user_id = (select users.id from users where users.name = 'Tester');
