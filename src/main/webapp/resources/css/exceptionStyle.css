@@ -4,10 +4,11 @@
     margin: 0;
 }
 .page-head {
-    background: #C0C0C0;
+    background: url("../images/header.png") #C0C0C0;
     width: 100%;
     min-width: 350px;
     height: 5em;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     position: relative;
     -webkit-user-select: none;
 }
