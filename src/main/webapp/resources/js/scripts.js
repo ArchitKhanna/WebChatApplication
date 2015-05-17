@@ -7,7 +7,7 @@ var chatState = {
     chatUrl: 'chat',
     currentUser: null,
     messageList: [],
-    token: 'TN11EN',
+    isEditing : false,
     isAvailable: false
 };
 
@@ -18,7 +18,7 @@ function run() {
     var currentUser = restoreCurrentUser();
     setCurrentUser(currentUser);
     restoreMessages();
-    poll();
+    //poll();
 }
 
 function setCurrentUser(user) {
@@ -41,7 +41,7 @@ function delegateEvent(evtObj) {
             onMessageEdit(evtObj.target);
         }
         if(evtObj.target.classList.contains('box-scroll')) {
-            onScroll();
+            scrollDown();
         }
     }
     if (evtObj.type === 'keydown' && evtObj.ctrlKey && evtObj.keyCode == 13) {
@@ -92,17 +92,17 @@ function createSignStructure(type) {
     var htmlAsText;
     if (type == 'read') {
         htmlAsText = '<xmp id="user-name">' + chatState.currentUser + '</xmp>'
-        + '<button id="sign-edit" class="sign-button">Edit</button>'
-        + '<button id="sign-out" class="sign-button">Sign Out</button>';
+        + '<button id="sign-out" class="chat-button sign-button">Sign Out</button>'
+        + '<button id="sign-edit" class="chat-button sign-button">Edit</button>';
     }
     if (type == 'modify') {
         htmlAsText = '<input id="sign-name" type="text" maxlength="25">'
-        + '<button id="sign-confirm" class="sign-button">Confirm</button>'
-        + '<button id="sign-out" class="sign-button">Sign Out</button>';
+        + '<button id="sign-out" class="chat-button sign-button">Sign Out</button>'
+        + '<button id="sign-confirm" class="chat-button sign-button">Confirm</button>';
     }
     if (type == 'out') {
         htmlAsText = '<input id="sign-name" type="text" maxlength="25">'
-        + '<button id="sign-in" class="sign-button">Sign in</button>';
+        + '<button id="sign-in" class="chat-button sign-button">Sign in</button>';
     }
     sign.innerHTML = htmlAsText;
 }
@@ -140,12 +140,17 @@ function onSignOutClick() {
 function onMessageSend(continueWith) {
     var messageText = document.getElementById('message-text');
     if (inputChecker(messageText.value) == true) {
-        var message = {
-            senderName: chatState.currentUser,
-            messageText: messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n")
-        };
-        postRequest(chatState.chatUrl, JSON.stringify(message), function () {
-            continueWith && continueWith();
+        $.ajax({
+            method: "POST",
+            url: chatState.chatUrl,
+            data: JSON.stringify({
+                senderName: chatState.currentUser,
+                messageText: messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n")
+            }),
+            error: function (error) {
+                serverAvailable(false);
+                restoreMessages();
+            }
         });
         messageText.value = '';
     }
@@ -154,16 +159,25 @@ function onMessageSend(continueWith) {
     }
 }
 
-function onScroll() {
+function scrollDown() {
     var chatBox = document.getElementsByClassName('chat-box')[0];
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+function isScrollInBottom() {
+    var chatBox = document.getElementsByClassName('chat-box')[0];
+    return $(chatBox)[0].scrollHeight - $(chatBox).scrollTop() == $(chatBox).outerHeight()
+}
+
 function addMessage(message) {
+    var isInBottom = isScrollInBottom();
     var item = createMessage(message);
     var chatBox = document.getElementsByClassName('chat-box')[0];
     chatState.messageList.push(message);
     chatBox.appendChild(item);
+    if (isInBottom && !chatState.isEditing) {
+        scrollDown();
+    }
 }
 
 function createMessage(message) {
@@ -199,6 +213,7 @@ function setDelete(divMessage, message) {
 }
 
 function setModify(divMessage, message) {
+    var isInBottom = isScrollInBottom();
     var modify = divMessage.getElementsByClassName('modify')[0];
     var messageItem = divMessage.getElementsByClassName('message message-item')[0];
     messageItem.innerHTML = message.messageText;
@@ -209,6 +224,9 @@ function setModify(divMessage, message) {
         divMessage.appendChild(modify);
     }
     modify.innerHTML = 'Message was modified on ' + message.modifyDate;
+    if (isInBottom && !chatState.isEditing) {
+        scrollDown();
+    }
 }
 
 function addTool(divMessage) {
@@ -251,14 +269,18 @@ function makeToEdit(divMessage, type) {
     var item;
     var text;
     if (type == 'edit') {
+        sendActivator(false);
+        chatState.isEditing = true;
         message = divMessage.getElementsByClassName('message-item')[0];
         item = document.createElement('textarea');
         item.setAttribute('class', 'message message-edit-text');
         item.value = message.innerHTML.trim().replace(new RegExp("\\n", 'g'), "\n");
     }
     if (type == 'read') {
+        sendActivator(true);
+        chatState.isEditing = false;
         message = divMessage.getElementsByClassName('message-edit-text')[0];
-        if(inputChecker(message.value) == false) {
+        if (inputChecker(message.value) == false) {
             return "";
         }
         item = document.createElement('xmp');
@@ -298,24 +320,34 @@ function onMessageConfirmClick(tools, continueWith) {
         tools.removeChild(tools.lastChild);
         tools.appendChild(toolsButtonsChange('edit'));
         var id = divMessage.attributes['id'].value;
-        var message = {
-            id: id,
-            messageText: text
-        };
-        putRequest(chatState.chatUrl, JSON.stringify(message), function () {
-            continueWith && continueWith();
-        });
+        $.ajax({
+            method: "PUT",
+            url: chatState.chatUrl,
+            data: JSON.stringify({
+                id: id,
+                messageText: text
+            }),
+            error: function (error) {
+                serverAvailable(false);
+                restoreMessages();
+            }
+        })
     }
 }
 
 function onMessageDelete(divMessage, continueWith) {
     var id = divMessage.attributes['id'].value;
-    var message = {
-        id: id
-    };
-    deleteRequest(chatState.chatUrl, JSON.stringify(message), function () {
-        continueWith && continueWith();
-    });
+    $.ajax({
+        method: "DELETE",
+        url: chatState.chatUrl,
+        data: JSON.stringify({
+            id: id
+        }),
+        error: function (error) {
+            serverAvailable(false);
+            restoreMessages();
+        }
+    })
 }
 
 function storeCurrentUser(user) {
@@ -333,27 +365,37 @@ function restoreMessages(continueWith) {
         url : "restore",
         success : function(data) {
             getHistory(data);
+            serverAvailable(true);
+        },
+        error : function(error) {
+            serverAvailable(false);
+            restoreMessages();
         },
         dataType : "json"
     });
 }
 
-function poll() {
+(function poll() {
     $.ajax({
         url : chatState.chatUrl,
         success : function(data) {
             getHistory(data);
+            serverAvailable(true);
+        },
+        error : function(error) {
+            if(error.statusText != "timeout") {
+                serverAvailable(false);
+                restoreMessages();
+            }
         },
         dataType : "json",
         complete : poll,
         timeout : 30000
     });
-}
+})();
 
 function getHistory(response, continueWith) {
-    if (response != "") {
-        createOrUpdateMessages(response.messages);
-    }
+    createOrUpdateMessages(response.messages);
     continueWith && continueWith();
 }
 
@@ -380,82 +422,9 @@ function findMessageIndexById(id) {
     return -1;
 }
 
-function getRequest(url, continueWith, continueWithError) {
-    ajax('GET', url, null, continueWith, continueWithError);
-}
-
-function postRequest(url, data, continueWith, continueWithError) {
-    ajax('POST', url, data, continueWith, continueWithError);
-}
-
-function deleteRequest(url, data, continueWith, continueWithError) {
-    ajax('DELETE', url, data, continueWith, continueWithError);
-}
-
-function putRequest(url, data, continueWith, continueWithError) {
-    ajax('PUT', url, data, continueWith, continueWithError);
-}
-
-function defaultErrorHandler(message) {
-    console.error(message);
-    chatState.token = 'TN' + (chatState.messageList.length * 8 + 11) + 'EN';
-    restoreMessages();
-}
-
-function isError(text) {
-    if(text == "")
-        return false;
-    try {
-        var obj = JSON.parse(text);
-    } catch(ex) {
-        return true;
-    }
-    return !!obj.error;
-}
-
-function ajax(method, url, data, continueWith, continueWithError) {
-    var xhr = new XMLHttpRequest();
-    continueWithError = continueWithError || defaultErrorHandler;
-    xhr.open(method || 'GET', url, true);
-    xhr.onload = function () {
-        if (xhr.readyState !== 4)
-            return;
-        if (xhr.status != 200 && xhr.status != 304) {
-            serverAvailable(false, method);
-            continueWithError('Error on the server side, response ' + xhr.status);
-            return;
-        }
-        if (isError(xhr.responseText)&& xhr.status != 304) {
-            serverAvailable(false, method);
-            continueWithError('Error on the server side, response ' + xhr.responseText);
-            return;
-        }
-        serverAvailable(true, method);
-        continueWith(xhr.responseText);
-    };
-    xhr.ontimeout = function () {
-        serverAvailable(false, method);
-        continueWithError('Server timed out!');
-    };
-    xhr.onerror = function () {
-        serverAvailable(false, method);
-        var errMsg = 'Server connection error!\n' +
-            '\n' +
-            'Check if \n' +
-            '- server is active\n' +
-            '- server sends header "Access-Control-Allow-Origin:*"';
-
-        continueWithError(errMsg);
-    };
-    xhr.send(data);
-}
-
-function serverAvailable(newCondition, method) {
+function serverAvailable(newCondition/*, method*/) {
     if (chatState.isAvailable != newCondition) {
         availableSwitcher(newCondition)
-    }
-    if (method != 'GET' && !chatState.isAvailable) {
-        unavailableAlert(method);
     }
 }
 
@@ -468,17 +437,4 @@ function availableSwitcher(newCondition) {
         indicator.style.background = "#E61610";
     }
     chatState.isAvailable = newCondition;
-}
-
-
-function unavailableAlert(method) {
-    if (method == 'POST') {
-        alert("Message hasn't been sent. Server is unavailable!");
-    }
-    if (method == 'PUT') {
-        alert("Message hasn't been edited. Server is unavailable!");
-    }
-    if (method == 'DELETE') {
-        alert("Message hasn't been deleted. Server is unavailable!");
-    }
 }
