@@ -146,6 +146,7 @@ function onMessageSend() {
                 senderName: chatState.currentUser,
                 messageText: messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n")
             }),
+            contentType: "application/json; charset=UTF-8",
             error: function () {
                 serverAvailable(false);
                 restoreMessages();
@@ -326,6 +327,7 @@ function onMessageConfirmClick(tools) {
                 id: id,
                 messageText: text
             }),
+            contentType: "application/json; charset=UTF-8",
             error: function () {
                 serverAvailable(false);
                 restoreMessages();
@@ -342,6 +344,7 @@ function onMessageDelete(divMessage) {
         data: JSON.stringify({
             id: id
         }),
+        contentType: "application/json; charset=UTF-8",
         error: function () {
             serverAvailable(false);
             restoreMessages();
