@@ -32,4 +32,9 @@ Now editing and deleting messages are available. How to see web exceptions (400,
     (f. e. `http://localhost:8080/WebChatApplication/hub`)
     * 500 - Write after mask /WebChatApplication/ something wrong  
     (f. e. `http://localhost:8080/WebChatApplication/chat?token=XXX`)
-* **Task12**
+* **Task 12** :
+This is the stable version of the project. In this version used ajax polling and cache technology.
+* Task 12* :
+Long polling version of the project. Requests rewrited with jQuery lib. Also chat has clever scrolling now.
+* Task 13 :
+MySQL data base created.
