@@ -1,10 +1,10 @@
 /**
- * Created by Gennady on 03.03.2015.
+ * Created by Gennady Trubach on 03.03.2015.
  */
 'use strict';
 
 var chatState = {
-    chatUrl: 'chat',
+    chatUrl: "chat",
     currentUser: null,
     messageList: [],
     isEditing : false,
@@ -18,7 +18,6 @@ function run() {
     var currentUser = restoreCurrentUser();
     setCurrentUser(currentUser);
     restoreMessages();
-    //poll();
 }
 
 function setCurrentUser(user) {
@@ -137,7 +136,7 @@ function onSignOutClick() {
     sendActivator(false);
 }
 
-function onMessageSend(continueWith) {
+function onMessageSend() {
     var messageText = document.getElementById('message-text');
     if (inputChecker(messageText.value) == true) {
         $.ajax({
@@ -147,7 +146,7 @@ function onMessageSend(continueWith) {
                 senderName: chatState.currentUser,
                 messageText: messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n")
             }),
-            error: function (error) {
+            error: function () {
                 serverAvailable(false);
                 restoreMessages();
             }
@@ -313,7 +312,7 @@ function onMessageEditClick(tools) {
     tools.appendChild(toolsButtonsChange('confirm'));
 }
 
-function onMessageConfirmClick(tools, continueWith) {
+function onMessageConfirmClick(tools) {
     var divMessage = tools.parentElement;
     var text = makeToEdit(divMessage, 'read');
     if (text != "") {
@@ -327,7 +326,7 @@ function onMessageConfirmClick(tools, continueWith) {
                 id: id,
                 messageText: text
             }),
-            error: function (error) {
+            error: function () {
                 serverAvailable(false);
                 restoreMessages();
             }
@@ -335,7 +334,7 @@ function onMessageConfirmClick(tools, continueWith) {
     }
 }
 
-function onMessageDelete(divMessage, continueWith) {
+function onMessageDelete(divMessage) {
     var id = divMessage.attributes['id'].value;
     $.ajax({
         method: "DELETE",
@@ -343,7 +342,7 @@ function onMessageDelete(divMessage, continueWith) {
         data: JSON.stringify({
             id: id
         }),
-        error: function (error) {
+        error: function () {
             serverAvailable(false);
             restoreMessages();
         }
@@ -360,14 +359,14 @@ function restoreCurrentUser() {
     return currentUser && JSON.parse(currentUser);
 }
 
-function restoreMessages(continueWith) {
+function restoreMessages() {
     $.ajax({
         url : "restore",
         success : function(data) {
             getHistory(data);
             serverAvailable(true);
         },
-        error : function(error) {
+        error : function() {
             serverAvailable(false);
             restoreMessages();
         },
@@ -394,9 +393,8 @@ function restoreMessages(continueWith) {
     });
 })();
 
-function getHistory(response, continueWith) {
+function getHistory(response) {
     createOrUpdateMessages(response.messages);
-    continueWith && continueWith();
 }
 
 function createOrUpdateMessages(messages) {

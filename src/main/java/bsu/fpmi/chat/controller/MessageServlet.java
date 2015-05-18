@@ -48,7 +48,7 @@ public class MessageServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Get request");
         final AsyncContext asyncContext = request.startAsync();
-        asyncContext.setTimeout(100000);
+        asyncContext.setTimeout(300000);
         AsyncProcessor.addAsyncContext(asyncContext);
     }
 
