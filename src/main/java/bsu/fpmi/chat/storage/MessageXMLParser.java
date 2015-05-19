@@ -19,14 +19,12 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import static bsu.fpmi.chat.util.ServletUtil.UTF_8;
 
 /**
  * Created by Gennady Trubach on 23.04.2015.
@@ -106,7 +104,8 @@ public final class MessageXMLParser {
         String modifyDate = null;
         boolean isDeleted = false;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new FileReader(XML_LOCATION));
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new InputStreamReader(
+                new FileInputStream(XML_LOCATION), Charset.forName((UTF_8))));
         while (xmlStreamReader.hasNext()) {
             switch (xmlStreamReader.next()) {
                 case XMLStreamConstants.START_ELEMENT:
@@ -199,10 +198,5 @@ public final class MessageXMLParser {
     public static synchronized boolean isStorageExist() {
         File file = new File(XML_LOCATION);
         return file.exists();
-    }
-
-    public static synchronized long getLastModifyDate() {
-        File file = new File(XML_LOCATION);
-        return file.lastModified();
     }
 }
