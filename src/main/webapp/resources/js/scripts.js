@@ -364,35 +364,37 @@ function restoreCurrentUser() {
 
 function restoreMessages() {
     $.ajax({
-        url : "restore",
-        success : function(data) {
+        url: "restore",
+        success: function (data) {
             getHistory(data);
             serverAvailable(true);
         },
-        error : function() {
+        error: function () {
             serverAvailable(false);
             restoreMessages();
         },
-        dataType : "json"
+        cache: false,
+        dataType: "json"
     });
 }
 
 (function poll() {
     $.ajax({
-        url : chatState.chatUrl,
-        success : function(data) {
+        url: chatState.chatUrl,
+        success: function (data) {
             getHistory(data);
             serverAvailable(true);
         },
-        error : function(error) {
-            if(error.statusText != "timeout") {
+        error: function (error) {
+            if (error.statusText != "timeout") {
                 serverAvailable(false);
                 restoreMessages();
             }
         },
-        dataType : "json",
-        complete : poll,
-        timeout : 30000
+        cache: false,
+        dataType: "json",
+        complete: poll,
+        timeout: 30000
     });
 })();
 

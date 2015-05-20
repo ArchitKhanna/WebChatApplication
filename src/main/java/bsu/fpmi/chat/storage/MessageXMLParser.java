@@ -105,7 +105,7 @@ public final class MessageXMLParser {
         boolean isDeleted = false;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new InputStreamReader(
-                new FileInputStream(XML_LOCATION), Charset.forName((UTF_8))));
+                new FileInputStream(XML_LOCATION), Charset.forName(UTF_8)));
         while (xmlStreamReader.hasNext()) {
             switch (xmlStreamReader.next()) {
                 case XMLStreamConstants.START_ELEMENT:
