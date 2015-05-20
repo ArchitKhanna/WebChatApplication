@@ -425,7 +425,7 @@ function findMessageIndexById(id) {
     return -1;
 }
 
-function serverAvailable(newCondition/*, method*/) {
+function serverAvailable(newCondition) {
     if (chatState.isAvailable != newCondition) {
         availableSwitcher(newCondition)
     }
