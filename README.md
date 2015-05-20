@@ -2,13 +2,13 @@
 
 Repository of Gennady Trubach (2d course 5th group) for studying practise in Belarussian State University.
 
-## How to get this project in Intelij IDEA
+## How to get this project in Intellij IDEA
 
 1. Go to File->New->Project from exiting sources.
 2. Then choose Import project from external model->Maven.
 3. Next choose some settings and finish importing the project.
 
-## How to add local Tomcat server in Intelij IDEA
+## How to add local Tomcat server in Intellij IDEA
 
 1. Go to Run->Edit Configurations.
 2. Add New Configuration->Tomcat Server->Local.
@@ -34,7 +34,7 @@ Now editing and deleting messages are available. How to see web exceptions (400,
     (f. e. `http://localhost:8080/WebChatApplication/chat?token=XXX`)
 * Task 12 :
 In this version used ajax polling and cache technology.
-* **Task 12`*`** :
+* **Task 12\*** :
 This is the stable version of the project. Long polling version of the project. Requests rewrited with jQuery lib. Also chat has clever scrolling now.
 * Task 13 :
 MySQL data base created.
