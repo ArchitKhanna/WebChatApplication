@@ -24,9 +24,11 @@ DROP TABLE IF EXISTS `messages`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `messages` (
   `id` varchar(20) NOT NULL,
-  `text` varchar(1000) NOT NULL,
-  `date` datetime NOT NULL,
   `user_id` varchar(20) NOT NULL,
+  `text` varchar(1000) NOT NULL,
+  `send_date` datetime NOT NULL,
+  `modify_date` datetime DEFAULT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `messages_ibfk_1` (`user_id`),
   CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
@@ -39,7 +41,7 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
-INSERT INTO `messages` VALUES ('1164146276','Bayern is the champion!','2015-05-02 00:00:00','9'),('190983840','Hello!','2015-05-16 23:41:43','1'),('3467369505','Fine too, cockatoo!','2015-05-16 23:46:43','5'),('4026089152','Neuer is the best keeper!','2015-05-16 23:44:43','9'),('4434381272','Dinamo won Granit 1-0!','2015-05-02 23:42:31','1'),('4839477818','Привет. Я тестер.','2015-05-02 17:36:50','3'),('5227858862','hello! how are you?','2015-05-16 23:45:28','5'),('5492609566','I am fine and you?','2015-05-16 23:45:38','4'),('6389072510','How are you?','2015-05-16 23:42:11','1'),('6461776988','I am user 1!','2015-05-15 08:00:45','6'),('6640571152','Hell knows, any suggestions','2015-05-16 23:45:57','4'),('7170559721','I have done algoritms on the weekend=)','2015-05-16 23:41:53','11'),('7668835110','Тест русского языка.','2015-05-02 23:47:12','3'),('8251411490','I want summer as faster as it possible.','2015-05-02 23:44:00','1'),('9925124706','What are you going tonight?','2015-05-16 23:45:51','5');
+INSERT INTO `messages` VALUES ('1164146276','9','Bayern is the champion!','2015-05-02 00:00:00',NULL,0),('190983840','1','Hello!','2015-05-16 23:41:43',NULL,0);
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -76,4 +78,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-05-17  0:53:52
+-- Dump completed on 2015-05-22 23:37:17
