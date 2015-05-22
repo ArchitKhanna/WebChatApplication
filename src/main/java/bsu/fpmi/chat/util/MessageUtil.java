@@ -16,10 +16,7 @@ import java.util.TimeZone;
  * FAMCS 2d course 5th group
  */
 public final class MessageUtil {
-    public static final String TOKEN = "token";
     public static final String MESSAGES = "messages";
-    private static final String TN = "TN";
-    private static final String EN = "EN";
     private static final String ID = "id";
     private static final String SENDER_NAME = "senderName";
     private static final String MESSAGE_TEXT = "messageText";
@@ -28,15 +25,6 @@ public final class MessageUtil {
     private static final long LIMIT = 10000000000L;
 
     private MessageUtil() {
-    }
-
-    public static String getToken(int index) {
-        Integer number = index * 8 + 11;
-        return TN + number + EN;
-    }
-
-    public static int getIndex(String token) {
-        return (Integer.valueOf(token.substring(2, token.length() - 2)) - 11) / 8;
     }
 
     private static String generateId() {
