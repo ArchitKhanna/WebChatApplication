@@ -8,11 +8,11 @@ import java.util.List;
  * Created by Gennady Trubach on 22.05.2015.
  */
 public interface MessageDAO {
-    boolean addMessage(Message message);
+    void addMessage(Message message);
 
     Message updateMessage(Message message);
 
-    boolean deleteMessage(Message message);
+    void deleteMessage(Message message);
 
     List<Message> getMessages();
 }
