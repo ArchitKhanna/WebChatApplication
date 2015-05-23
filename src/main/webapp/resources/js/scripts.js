@@ -208,7 +208,7 @@ function updateMessage(divMessage, message) {
 }
 
 function setDelete(divMessage, message) {
-    divMessage.innerHTML = '<div class="message sender-name">' + message.sendDate + ' '
+    divMessage.innerHTML = '<div class="message sender-name">(' + message.sendDate + ') '
     + message.senderName + '</div>' + '<p class="modify">deleted</p>';
 }
 
@@ -333,7 +333,7 @@ function onMessageConfirmClick(tools) {
                 serverAvailable(false);
                 restoreMessages();
             }
-        })
+        });
     }
 }
 
@@ -350,7 +350,8 @@ function onMessageDelete(divMessage) {
             serverAvailable(false);
             restoreMessages();
         }
-    })
+    });
+    sendActivator(true);
 }
 
 function storeCurrentUser(user) {
