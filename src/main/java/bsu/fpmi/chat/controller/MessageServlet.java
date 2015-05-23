@@ -1,13 +1,13 @@
 package bsu.fpmi.chat.controller;
 
+import bsu.fpmi.chat.dao.MessageDAO;
+import bsu.fpmi.chat.dao.MessageDAOImplementation;
 import bsu.fpmi.chat.exception.ModifyException;
 import bsu.fpmi.chat.model.Message;
 import bsu.fpmi.chat.proccesor.AsyncProcessor;
-import bsu.fpmi.chat.storage.MessageXMLParser;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.xml.sax.SAXException;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -15,16 +15,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 
 import static bsu.fpmi.chat.util.MessageUtil.*;
-import static bsu.fpmi.chat.util.ServletUtil.*;
+import static bsu.fpmi.chat.util.ServletUtil.getMessageBody;
 
 /**
  * Created by Gennady Trubach on 21.04.2015.
@@ -34,14 +29,11 @@ import static bsu.fpmi.chat.util.ServletUtil.*;
 public class MessageServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
+    private MessageDAO messageDAO;
 
     @Override
     public void init() throws ServletException {
-        try {
-            restoreHistory();
-        } catch (TransformerException | ParserConfigurationException | XMLStreamException | FileNotFoundException e) {
-            logger.error(e);
-        }
+        this.messageDAO = new MessageDAOImplementation();
     }
 
     @Override
@@ -61,10 +53,10 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             Message message = jsonToNewMessage(jsonObject);
             logger.info(message.getReadableView());
-            MessageXMLParser.addMessage(message);
+            messageDAO.addMessage(message);
             AsyncProcessor.notifyAllClients(serverResponse(message));
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (ParseException | ParserConfigurationException | SAXException | TransformerException | NullPointerException e) {
+        } catch (ParseException | java.text.ParseException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
         }
@@ -80,11 +72,10 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             message = jsonToCurrentMessage(jsonObject);
             message.setModified();
-            Message updatedMessage = MessageXMLParser.updateMessage(message);
-            AsyncProcessor.notifyAllClients(serverResponse(updatedMessage));
+            messageDAO.updateMessage(message);
+            AsyncProcessor.notifyAllClients(serverResponse(messageDAO.getMessageById(message.getID())));
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
-                NullPointerException e) {
+        } catch (ParseException | java.text.ParseException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
         } catch (ModifyException e) {
@@ -103,11 +94,10 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             message = jsonToCurrentMessage(jsonObject);
             message.delete();
-            Message updatedMessage = MessageXMLParser.updateMessage(message);
-            AsyncProcessor.notifyAllClients(serverResponse(updatedMessage));
+            messageDAO.updateMessage(message);
+            AsyncProcessor.notifyAllClients(serverResponse(messageDAO.getMessageById(message.getID())));
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
-                NullPointerException e) {
+        } catch (ParseException | java.text.ParseException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
         } catch (ModifyException e) {
@@ -120,17 +110,5 @@ public class MessageServlet extends HttpServlet {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(MESSAGES, Collections.singletonList(message));
         return jsonObject.toJSONString();
-    }
-
-
-    private void restoreHistory() throws TransformerException, ParserConfigurationException, XMLStreamException,
-            FileNotFoundException {
-        if (!MessageXMLParser.isStorageExist()) {
-            MessageXMLParser.createStorage();
-        } else {
-            for (Message message : MessageXMLParser.getMessages()) {
-                logger.info(message.getReadableView());
-            }
-        }
     }
 }

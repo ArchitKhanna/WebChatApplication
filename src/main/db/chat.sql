@@ -41,7 +41,7 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
-INSERT INTO `messages` VALUES ('1164146276','9','Bayern is the champion!','2015-05-02 00:00:00',NULL,0),('190983840','1','Hello!','2015-05-16 23:41:43',NULL,0);
+INSERT INTO `messages` VALUES ('1164146276','9','Bayern is the champion!','2015-05-02 00:00:00',NULL,0),('190983840','1','Hello!','2015-05-16 23:41:43',NULL,0),('3380920996','1','Привет!!!!!=)=)','2015-05-23 11:55:19',NULL,0),('351555896','1','Helooooasfassf=)','2015-05-23 11:55:05',NULL,0);
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -78,4 +78,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-05-22 23:37:17
+-- Dump completed on 2015-05-23 14:57:52

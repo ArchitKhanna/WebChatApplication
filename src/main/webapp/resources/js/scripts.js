@@ -286,6 +286,7 @@ function makeToEdit(divMessage, type) {
         item = document.createElement('xmp');
         item.setAttribute('class', 'message message-item');
         text = message.value.trim().replace(new RegExp("\n", 'g'), "\\n");
+        item.innerHTML = text;
     }
     divMessage.replaceChild(item, message);
     item.focus();

@@ -1,7 +1,8 @@
 package bsu.fpmi.chat.controller;
 
+import bsu.fpmi.chat.dao.MessageDAO;
+import bsu.fpmi.chat.dao.MessageDAOImplementation;
 import bsu.fpmi.chat.model.Message;
-import bsu.fpmi.chat.storage.MessageXMLParser;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
@@ -10,12 +11,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
 
 import static bsu.fpmi.chat.util.MessageUtil.MESSAGES;
 import static bsu.fpmi.chat.util.ServletUtil.APPLICATION_JSON;
@@ -28,16 +26,21 @@ import static bsu.fpmi.chat.util.ServletUtil.UTF_8;
 public class HistoryServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
+    private MessageDAO messageDAO;
 
     @Override
     public void init() throws ServletException {
         try {
-            restoreHistory();
-        } catch (TransformerException | ParserConfigurationException | XMLStreamException | FileNotFoundException e) {
+            this.messageDAO = new MessageDAOImplementation();
+            for (Message message : messageDAO.getMessages()) {
+                logger.info(message.getReadableView());
+            }
+        } catch (ParseException e) {
             logger.error(e);
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Get request in history restore");
         try {
@@ -47,25 +50,14 @@ public class HistoryServlet extends HttpServlet {
             PrintWriter pw = response.getWriter();
             pw.print(messages);
             pw.flush();
-        } catch (XMLStreamException e) {
+        } catch (ParseException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 
-    private String serverResponse() throws IOException, XMLStreamException {
+    private String serverResponse() throws ParseException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put(MESSAGES, MessageXMLParser.getMessages());
+        jsonObject.put(MESSAGES, messageDAO.getMessages());
         return jsonObject.toJSONString();
-    }
-
-    private void restoreHistory() throws TransformerException, ParserConfigurationException, XMLStreamException,
-            FileNotFoundException {
-        if (!MessageXMLParser.isStorageExist()) {
-            MessageXMLParser.createStorage();
-        } else {
-            for (Message message : MessageXMLParser.getMessages()) {
-                logger.info(message.getReadableView());
-            }
-        }
     }
 }
