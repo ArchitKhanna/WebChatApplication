@@ -25,12 +25,13 @@ import static bsu.fpmi.chat.util.ServletUtil.UTF_8;
 @WebServlet(urlPatterns = "/restore")
 public class HistoryServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
+    private static Logger logger = Logger.getLogger(HistoryServlet.class.getName());
     private MessageDAO messageDAO;
 
     @Override
     public void init() throws ServletException {
         try {
+            logger.info("Initialization");
             this.messageDAO = new MessageDAOImplementation();
             for (Message message : messageDAO.getMessages()) {
                 logger.info(message.getReadableView());
@@ -42,7 +43,7 @@ public class HistoryServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.info("Get request in history restore");
+        logger.info("Get request");
         try {
             String messages = serverResponse();
             response.setContentType(APPLICATION_JSON);
@@ -52,6 +53,7 @@ public class HistoryServlet extends HttpServlet {
             pw.flush();
         } catch (ParseException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            logger.error(e);
         }
     }
 

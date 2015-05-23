@@ -33,6 +33,7 @@ public class MessageServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
+        logger.info("Initialization");
         this.messageDAO = new MessageDAOImplementation();
     }
 

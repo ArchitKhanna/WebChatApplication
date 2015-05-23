@@ -44,6 +44,7 @@ public class MessageDAOImplementation implements MessageDAO {
                 preparedStatement.setTimestamp(5, formatDbDate(message.getModifyDate()));
                 preparedStatement.setBoolean(6, message.isDeleted());
                 preparedStatement.executeUpdate();
+                logger.info("Added message " + message.getReadableView());
             }
         } catch (SQLException e) {
             logger.error(e);
@@ -91,6 +92,7 @@ public class MessageDAOImplementation implements MessageDAO {
             preparedStatement.setBoolean(3, message.isDeleted());
             preparedStatement.setString(4, message.getID());
             preparedStatement.executeUpdate();
+            logger.info("Updated message with id" + message.getID());
         } catch (SQLException e) {
             logger.error(e);
         } finally {
@@ -127,7 +129,7 @@ public class MessageDAOImplementation implements MessageDAO {
         try {
             connection = ConnectionManager.getConnection();
             statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM messages JOIN users ON users.id = messages.user_id");
+            resultSet = statement.executeQuery("SELECT * FROM messages JOIN users ON users.id = messages.user_id ORDER BY messages.send_date");
             while (resultSet.next()) {
                 String id = resultSet.getString(ID);
                 String name = resultSet.getString(NAME);
@@ -183,6 +185,7 @@ public class MessageDAOImplementation implements MessageDAO {
                 String modifyDate = formatStringDate(resultSet.getTimestamp(MODIFY_DATE));
                 boolean isDeleted = resultSet.getBoolean(DELETED);
                 message = new Message(id, name, text, sendDate, modifyDate, isDeleted);
+                logger.info("Get message" + message.getReadableView());
             }
         } catch (SQLException e) {
             logger.error(e);
