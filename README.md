@@ -34,9 +34,9 @@ Now editing and deleting messages are available. How to see web exceptions (400,
     (f. e. `http://localhost:8080/WebChatApplication/chat?token=XXX`)
 * Task 12 :
 In this version used ajax polling and cache technology.
-* **Task 12*** :
-This is the stable version of the project. Long polling version of the project. Requests rewrited with jQuery lib. Also chat has clever scrolling now.
+* Task 12* :
+Long polling version of the project. Requests rewrited with jQuery lib. Also chat has clever scrolling now.
 * Task 13 :
 MySQL data base created.
-* Task 14 :
-In developing.
+* **Task 14** :
+This is the stable version of the project. All messages and users are stored in databases. Also add improvement with logging in special database.
