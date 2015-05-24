@@ -1,7 +1,7 @@
 package bsu.fpmi.chat.controller;
 
 import bsu.fpmi.chat.dao.MessageDAO;
-import bsu.fpmi.chat.dao.MessageDAOImplementation;
+import bsu.fpmi.chat.dao.ObjectDAO;
 import bsu.fpmi.chat.exception.ModifyException;
 import bsu.fpmi.chat.model.Message;
 import bsu.fpmi.chat.proccesor.AsyncProcessor;
@@ -29,12 +29,12 @@ import static bsu.fpmi.chat.util.ServletUtil.getMessageBody;
 public class MessageServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
-    private MessageDAO messageDAO;
+    private ObjectDAO<Message> messageDAO;
 
     @Override
     public void init() throws ServletException {
         logger.info("Initialization");
-        this.messageDAO = new MessageDAOImplementation();
+        this.messageDAO = new MessageDAO();
     }
 
     @Override
@@ -54,7 +54,7 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             Message message = jsonToNewMessage(jsonObject);
             logger.info(message.getReadableView());
-            messageDAO.addMessage(message);
+            messageDAO.addObject(message);
             AsyncProcessor.notifyAllClients(serverResponse(message));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | java.text.ParseException | NullPointerException e) {
@@ -73,8 +73,8 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             message = jsonToCurrentMessage(jsonObject);
             message.setModified();
-            messageDAO.updateMessage(message);
-            AsyncProcessor.notifyAllClients(serverResponse(messageDAO.getMessageById(message.getID())));
+            messageDAO.updateObject(message);
+            AsyncProcessor.notifyAllClients(serverResponse(messageDAO.getObjectById(message.getID())));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | java.text.ParseException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -95,8 +95,8 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             message = jsonToCurrentMessage(jsonObject);
             message.delete();
-            messageDAO.updateMessage(message);
-            AsyncProcessor.notifyAllClients(serverResponse(messageDAO.getMessageById(message.getID())));
+            messageDAO.updateObject(message);
+            AsyncProcessor.notifyAllClients(serverResponse(messageDAO.getObjectById(message.getID())));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | java.text.ParseException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);

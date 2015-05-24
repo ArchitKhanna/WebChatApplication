@@ -1,7 +1,7 @@
 package bsu.fpmi.chat.controller;
 
 import bsu.fpmi.chat.dao.MessageDAO;
-import bsu.fpmi.chat.dao.MessageDAOImplementation;
+import bsu.fpmi.chat.dao.ObjectDAO;
 import bsu.fpmi.chat.model.Message;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -26,14 +26,14 @@ import static bsu.fpmi.chat.util.ServletUtil.UTF_8;
 public class HistoryServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(HistoryServlet.class.getName());
-    private MessageDAO messageDAO;
+    private ObjectDAO<Message> messageDAO;
 
     @Override
     public void init() throws ServletException {
         try {
             logger.info("Initialization");
-            this.messageDAO = new MessageDAOImplementation();
-            for (Message message : messageDAO.getMessages()) {
+            this.messageDAO = new MessageDAO();
+            for (Message message : messageDAO.getObject()) {
                 logger.info(message.getReadableView());
             }
         } catch (ParseException e) {
@@ -59,7 +59,7 @@ public class HistoryServlet extends HttpServlet {
 
     private String serverResponse() throws ParseException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put(MESSAGES, messageDAO.getMessages());
+        jsonObject.put(MESSAGES, messageDAO.getObject());
         return jsonObject.toJSONString();
     }
 }

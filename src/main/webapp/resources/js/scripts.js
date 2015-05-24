@@ -5,9 +5,12 @@
 
 var chatState = {
     chatUrl: "chat",
-    currentUser: null,
+    currentUser: {
+        id: null,
+        name: null
+    },
     messageList: [],
-    isEditing : false,
+    isEditing: false,
     isAvailable: false
 };
 
@@ -23,7 +26,7 @@ function run() {
 function setCurrentUser(user) {
     if (user != null) {
         var userName = document.getElementById('sign-name');
-        userName.value = user;
+        userName.value = user.name;
         onSignInClick();
     }
 }
@@ -54,11 +57,14 @@ function delegateEvent(evtObj) {
 }
 
 function onSignClick(button) {
-    if (button.id == 'sign-in' || button.id == 'sign-confirm') {
+    if (button.id == 'sign-in') {
         onSignInClick();
     }
     if (button.id == 'sign-edit') {
         onSignEditClick();
+    }
+    if (button.id == 'sign-confirm') {
+        onSignConfirmClick();
     }
     if (button.id == 'sign-out') {
         onSignOutClick();
@@ -90,7 +96,7 @@ function createSignStructure(type) {
     var sign = document.getElementsByClassName('sign')[0];
     var htmlAsText;
     if (type == 'read') {
-        htmlAsText = '<xmp id="user-name">' + chatState.currentUser + '</xmp>'
+        htmlAsText = '<xmp id="user-name">' + chatState.currentUser.name + '</xmp>'
         + '<button id="sign-out" class="chat-button sign-button">Sign Out</button>'
         + '<button id="sign-edit" class="chat-button sign-button">Edit</button>';
     }
@@ -109,11 +115,21 @@ function createSignStructure(type) {
 function onSignInClick() {
     var name = document.getElementById('sign-name');
     if (inputChecker(name.value) == true) {
-        chatState.currentUser = name.value;
-        storeCurrentUser(chatState.currentUser);
-        createSignStructure('read');
-        sendActivator(true);
-        createOrUpdateMessages(chatState.messageList);
+        $.ajax({
+            method: "POST",
+            url: "user",
+            data: JSON.stringify({
+                name: name.value
+            }),
+            contentType: "application/json; charset=UTF-8",
+            success: function () {
+                getUser(name.value);
+            },
+            error: function () {
+                serverAvailable(false);
+                restoreMessages();
+            }
+        });
     }
     else {
         name.focus();
@@ -123,17 +139,80 @@ function onSignInClick() {
 function onSignEditClick() {
     createSignStructure('modify');
     var name = document.getElementById('sign-name');
-    name.value = chatState.currentUser;
+    name.value = chatState.currentUser.name;
     name.focus();
     sendActivator(false);
 }
 
+function makeSignConfirm() {
+    storeCurrentUser(chatState.currentUser);
+    createSignStructure('read');
+    sendActivator(true);
+    createOrUpdateMessages(chatState.messageList);
+}
+
+function onSignConfirmClick() {
+    var name = document.getElementById('sign-name');
+    if (inputChecker(name.value) == true) {
+        if (chatState.currentUser.name === name.value) {
+            getUser(name.value);
+            return;
+        }
+        $.ajax({
+            method: "PUT",
+            url: "user",
+            data: JSON.stringify({
+                id: chatState.currentUser.id,
+                name: name.value
+            }),
+            contentType: "application/json; charset=UTF-8",
+            success: function () {
+                getUser(name.value);
+            },
+            error: function (error) {
+                if (error.status == 401) {
+                    alert("Incorrect name!");
+                    name.focus();
+                }
+                else {
+                    serverAvailable(false);
+                    restoreMessages();
+                }
+            }
+        });
+    }
+    else {
+        name.focus();
+    }
+}
+
 function onSignOutClick() {
     createSignStructure('out');
-    chatState.currentUser = null;
+    chatState.currentUser.name = null;
     localStorage.removeItem("Current user");
     createOrUpdateMessages(chatState.messageList);
     sendActivator(false);
+}
+
+function getUser(name) {
+    $.ajax({
+        url: "user",
+        data: {
+            name: name
+        },
+        success: function (data) {
+            serverAvailable(true);
+            chatState.currentUser.id = data.user.id;
+            chatState.currentUser.name = data.user.name;
+            makeSignConfirm();
+        },
+        error: function () {
+            serverAvailable(false);
+            restoreMessages();
+        },
+        cache: false,
+        dataType: "json"
+    });
 }
 
 function onMessageSend() {
@@ -143,7 +222,7 @@ function onMessageSend() {
             method: "POST",
             url: chatState.chatUrl,
             data: JSON.stringify({
-                senderName: chatState.currentUser,
+                senderName: chatState.currentUser.name,
                 messageText: messageText.value.trim().replace(new RegExp("\n", 'g'), "\\n")
             }),
             contentType: "application/json; charset=UTF-8",
@@ -192,6 +271,7 @@ function createMessage(message) {
 }
 
 function updateMessage(divMessage, message) {
+    divMessage.children[0].innerHTML =  '(' + message.sendDate + ') ' + message.senderName;
     if (message.isDeleted == 'true') {
         setDelete(divMessage, message);
         return;
@@ -199,7 +279,7 @@ function updateMessage(divMessage, message) {
     if(message.modifyDate != 'not modified') {
         setModify(divMessage, message);
     }
-    if (chatState.currentUser != undefined && message.senderName.toLowerCase() == chatState.currentUser.toLowerCase()) {
+    if (chatState.currentUser.name != undefined && message.senderName.toLowerCase() === chatState.currentUser.name.toLowerCase()) {
         addTool(divMessage);
     }
     else {
